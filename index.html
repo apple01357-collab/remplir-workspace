@@ -309,6 +309,7 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
 .b-needed   { background:rgba(126,207,170,.12); color:var(--s-needed);  border:1px solid rgba(126,207,170,.25); }
 .b-planned  { background:rgba(77,139,255,.13); color:var(--s-planned);  border:1px solid rgba(77,139,255,.25); }
 .b-bought   { background:rgba(85,91,112,.2);  color:var(--s-bought);    border:1px solid rgba(85,91,112,.3); }
+.b-pending  { background:rgba(240,192,64,.12); color:#f0c040;            border:1px solid rgba(240,192,64,.3); }
 .b-idea     { background:rgba(240,192,64,.13); color:var(--c-idea);     border:1px solid rgba(240,192,64,.25); }
 .b-stock    { background:rgba(167,139,250,.13); color:var(--c-stock);   border:1px solid rgba(167,139,250,.25); }
 
@@ -400,6 +401,39 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
   padding:18px 16px; max-width:760px; margin:0 auto; width:100%;
   padding-bottom:calc(18px + var(--sb));
 }
+/* Notice page */
+#page-notice { flex-direction:column; overflow-y:auto; }
+#notice-main {
+  padding:18px 16px; max-width:760px; margin:0 auto; width:100%;
+  padding-bottom:calc(18px + var(--sb));
+}
+/* Keyword filter banner */
+#kw-filter-bar {
+  display:none; align-items:center; gap:10px; margin-bottom:12px;
+  background:rgba(61,107,255,.10); border:1px solid rgba(61,107,255,.25);
+  border-radius:10px; padding:8px 13px;
+}
+#kw-filter-bar.on { display:flex; }
+.kw-filter-label { font-size:12px; color:var(--acc); font-weight:700; flex:1; }
+.kw-filter-clear { background:none; border:none; color:var(--tx3); font-size:18px; cursor:pointer; line-height:1; }
+/* User page */
+#page-user { flex-direction:column; overflow-y:auto; }
+#user-main {
+  padding:18px 16px; max-width:500px; margin:0 auto; width:100%;
+  padding-bottom:calc(18px + var(--sb));
+}
+.user-section { background:var(--sur); border:1px solid var(--bdr); border-radius:13px; padding:18px; margin-bottom:14px; }
+.user-section-title { font-size:12px; font-weight:700; color:var(--tx2); margin-bottom:14px; text-transform:uppercase; letter-spacing:.8px; }
+.user-info-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.user-info-label { font-size:11px; color:var(--tx3); width:50px; flex-shrink:0; }
+.user-info-val { font-size:13px; font-weight:600; color:var(--tx); }
+.user-save-btn {
+  background:var(--acc); border:none; border-radius:10px; padding:10px 20px;
+  color:#fff; font-size:13px; font-weight:700; cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif; transition:all .15s;
+}
+.user-save-btn:hover { background:#2f5de0; }
+.user-msg { font-size:12px; margin-top:9px; min-height:18px; }
 .today-header { margin-bottom:20px; }
 .today-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; margin-bottom:3px; }
 .today-sub { font-size:12px; color:var(--tx3); }
@@ -641,12 +675,98 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
   font-size:10px; font-weight:600; color:var(--tx3);
   background:var(--sur2); border:1px solid var(--bdr);
   border-radius:5px; padding:2px 7px; font-family:'Noto Sans KR',sans-serif;
-  letter-spacing:.2px;
+  letter-spacing:.2px; cursor:pointer; transition:all .13s;
 }
+.ds-kw-tag:hover { border-color:var(--acc); color:var(--acc); background:rgba(61,107,255,.08); }
 
-/* ── Inline memo (always visible) ─────── */
-.ds-memo-inline { margin-top:10px; }
-.ds-memo-actions { margin-top:6px; display:flex; justify-content:flex-start; }
+/* ── Memo view row ─────────────────────── */
+.ds-memo-view {
+  display:flex; align-items:flex-start; gap:7px; margin-top:8px;
+  background:var(--sur2); border:1px solid var(--bdr); border-radius:9px;
+  padding:8px 11px;
+}
+.ds-memo-text {
+  flex:1; font-size:12px; color:var(--tx3); line-height:1.6;
+  white-space:pre-wrap; word-break:break-word;
+}
+.ds-memo-edit-btn {
+  background:none; border:none; cursor:pointer; font-size:13px;
+  padding:0 2px; flex-shrink:0; opacity:.5; transition:opacity .13s; line-height:1;
+}
+.ds-memo-edit-btn:hover { opacity:1; }
+.ds-memo-add-btn {
+  background:none; border:1px dashed var(--bdr2); color:var(--tx3); font-size:11px;
+  font-weight:600; border-radius:7px; padding:5px 11px; cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif; transition:all .13s; margin-top:7px;
+  display:inline-block;
+}
+.ds-memo-add-btn:hover { border-color:var(--acc); color:var(--acc); }
+
+/* ── Inline memo (editing) ─────────── */
+.ds-memo-inline { margin-top:8px; }
+.ds-memo-actions { margin-top:6px; display:flex; gap:7px; justify-content:flex-start; }
+.ds-memo-cancel {
+  background:none; border:1px solid var(--bdr2); color:var(--tx3); font-size:11px;
+  font-weight:700; border-radius:8px; padding:6px 12px; cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif; transition:all .13s;
+}
+.ds-memo-cancel:hover { border-color:var(--bdr); color:var(--tx2); }
+
+/* ── 재고 섹션 ─────────────────────────── */
+.stock-series-row { display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-bottom:12px; }
+.stock-series-tag { font-size:10px; font-weight:700; color:var(--c-stock); background:rgba(167,139,250,.12); border:1px solid rgba(167,139,250,.2); border-radius:6px; padding:3px 8px; }
+.stock-unit-badge { font-size:10px; color:var(--tx3); background:var(--sur2); border:1px solid var(--bdr); border-radius:6px; padding:3px 8px; }
+.stock-sel { background:var(--sur2); border:1px solid var(--bdr); color:var(--tx); font-size:11px; border-radius:8px; padding:5px 8px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+.stock-sel:focus { border-color:var(--acc); outline:none; }
+.stock-unit-input { background:var(--sur2); border:1px solid var(--bdr); color:var(--tx); font-size:11px; border-radius:8px; padding:5px 8px; width:70px; font-family:'Noto Sans KR',sans-serif; }
+.stock-unit-input:focus { border-color:var(--acc); outline:none; }
+.stock-qty-display { display:flex; align-items:baseline; gap:5px; margin:10px 0; }
+.stock-qty-num { font-size:36px; font-weight:800; font-family:'Syne',sans-serif; line-height:1; }
+.stock-qty-unit { font-size:14px; font-weight:600; color:var(--tx3); }
+.stock-edit-row { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.stock-qty-input { background:var(--sur2); border:1.5px solid var(--bdr); color:var(--tx); font-size:12px; border-radius:9px; padding:7px 10px; width:90px; font-family:'Noto Sans KR',sans-serif; }
+.stock-qty-input:focus { border-color:var(--acc); outline:none; }
+.stock-record-row { display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-bottom:12px; }
+.stock-record-note { flex:1; min-width:80px; background:var(--sur2); border:1.5px solid var(--bdr); color:var(--tx); font-size:12px; border-radius:9px; padding:7px 10px; font-family:'Noto Sans KR',sans-serif; }
+.stock-record-note:focus { border-color:var(--acc); outline:none; }
+.stock-record-btn { border:none; border-radius:9px; padding:8px 13px; font-size:11px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all .15s; }
+.stock-record-btn.in  { background:rgba(126,207,170,.15); color:var(--c-supply); border:1.5px solid rgba(126,207,170,.3); }
+.stock-record-btn.out { background:rgba(255,79,100,.1);   color:var(--s-priority); border:1.5px solid rgba(255,79,100,.25); }
+.stock-record-btn:hover { filter:brightness(1.2); }
+.stock-save-btn { background:var(--acc); border:none; border-radius:8px; padding:6px 13px; color:#fff; font-size:11px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+.stock-history { background:var(--sur2); border:1px solid var(--bdr); border-radius:10px; padding:10px 12px; }
+.stock-rec-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--bdr); font-size:11px; flex-wrap:wrap; }
+.stock-rec-row:last-child { border-bottom:none; }
+/* 4단계 분류 그리드 */
+.stock-classify-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:10px; }
+.stock-classify-col { display:flex; flex-direction:column; gap:4px; }
+.stock-classify-label { font-size:9px; font-weight:700; color:var(--tx3); text-transform:uppercase; letter-spacing:.5px; }
+.stock-classify-grid .stock-sel { width:100%; }
+.stock-unit-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+
+/* ── 구매 정보 섹션 ─────────────────────── */
+.purchase-imgs-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.purchase-img-wrap { position:relative; display:inline-block; }
+.purchase-thumb { width:72px; height:72px; object-fit:cover; border-radius:9px; border:1.5px solid var(--bdr); cursor:pointer; transition:transform .15s; }
+.purchase-thumb:hover { transform:scale(1.05); }
+.purchase-img-del { position:absolute; top:-5px; right:-5px; background:var(--s-priority); border:none; color:#fff; border-radius:50%; width:17px; height:17px; font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; line-height:1; }
+.purchase-img-add-btn { border:1.5px dashed var(--bdr2); background:none; color:var(--tx3); border-radius:9px; padding:8px 12px; font-size:11px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all .15s; white-space:nowrap; }
+.purchase-img-add-btn:hover { border-color:var(--acc); color:var(--acc); }
+.purchase-field-row { display:flex; align-items:center; gap:8px; margin-bottom:9px; flex-wrap:wrap; }
+.purchase-field-col { display:flex; flex-direction:column; gap:5px; margin-bottom:9px; }
+.purchase-field-label { font-size:10px; font-weight:700; color:var(--tx3); min-width:60px; white-space:nowrap; }
+.purchase-field-input { flex:1; min-width:160px; background:var(--sur2); border:1.5px solid var(--bdr); color:var(--tx); font-size:12px; border-radius:9px; padding:7px 11px; font-family:'Noto Sans KR',sans-serif; }
+.purchase-field-input:focus { border-color:var(--c-supply); outline:none; }
+.purchase-link-open { font-size:11px; font-weight:700; color:var(--c-supply); text-decoration:none; white-space:nowrap; }
+.purchase-note-textarea { background:var(--sur2); border:1.5px solid var(--bdr); color:var(--tx); font-size:12px; border-radius:9px; padding:9px 11px; font-family:'Noto Sans KR',sans-serif; resize:vertical; min-height:64px; }
+.purchase-note-textarea:focus { border-color:var(--c-supply); outline:none; }
+.purchase-save-btn { background:var(--c-supply); border:none; border-radius:9px; padding:8px 18px; color:#0a1a12; font-size:12px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; margin-top:4px; }
+.purchase-save-btn:hover { filter:brightness(1.1); }
+
+/* ── 팀 배지 ───────────────────────────── */
+.acct-team-badge { font-size:10px; font-weight:700; color:var(--c-stock); background:rgba(167,139,250,.12); border:1px solid rgba(167,139,250,.22); border-radius:6px; padding:3px 8px; }
+.acct-team-sel { background:var(--sur2); border:1px solid var(--bdr); color:var(--tx); font-size:11px; border-radius:7px; padding:4px 7px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+.acct-team-sel:focus { border-color:var(--c-stock); outline:none; }
 
 .issue-log-add { margin-top:10px; }
 .log-type-row { display:flex; gap:6px; margin-bottom:8px; }
@@ -944,12 +1064,13 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
 .b-ts-done { background:rgba(126,207,170,.12); color:#7ecfaa; border:1px solid rgba(126,207,170,.3); }
 
 /* ── CLASSIFY POPUP ── */
-#popup-overlay {
+#popup-overlay, #dup-overlay {
   position:fixed; inset:0; z-index:800;
   background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
   display:none; align-items:center; justify-content:center; padding:20px;
 }
-#popup-overlay.open { display:flex; }
+#popup-overlay.open, #dup-overlay.open { display:flex; }
+.item-author { font-size:10px; color:var(--acc); opacity:.7; }
 .popup-box {
   background:var(--sur); border:1px solid var(--bdr2);
   border-radius:20px; padding:28px 24px; width:100%; max-width:420px;
@@ -1021,7 +1142,11 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
   .bnav-icon { font-size:18px; }
   .bnav-label { font-size:9px; font-weight:700; letter-spacing:.3px; }
   #dash-main { padding-bottom:calc(72px + var(--sb)); }
+  #today-main, #notice-main, #user-main { padding-bottom:calc(80px + var(--sb)); }
   #page-help, #page-admin { padding-bottom:calc(80px + var(--sb)); }
+  /* AI page: ia-wrap must sit above bottom nav */
+  #page-ai { padding-bottom:0; }
+  #page-ai .ia-wrap { padding-bottom:calc(10px + 60px + var(--sb)); }
 }
 
 /* scrollbar */
@@ -1065,8 +1190,10 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
   <!-- Nav tabs (PC) -->
   <div id="nav">
     <button class="nav-tab" data-page="today">⚡ 투데이</button>
+    <button class="nav-tab" data-page="notice">📢 공지사항</button>
     <button class="nav-tab active" data-page="dash">📋 대시보드</button>
     <button class="nav-tab" data-page="help">📖 사용방법</button>
+    <button class="nav-tab" data-page="user">👤 내 계정</button>
     <button class="nav-tab" data-page="admin">⚙️ 관리자</button>
   </div>
 
@@ -1078,6 +1205,12 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
 
       <div id="dash-main">
         <!-- Group summary cards -->
+        <!-- Keyword filter banner -->
+        <div id="kw-filter-bar">
+          <span class="kw-filter-label" id="kw-filter-label">키워드: </span>
+          <button class="kw-filter-clear" onclick="clearKwFilter()" title="필터 해제">✕</button>
+        </div>
+
         <div class="group-row" id="group-row">
           <div class="gcard gc-task"   onclick="setFilter('task')">
             <div class="gcard-icon">📋</div>
@@ -1103,11 +1236,6 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
             <div class="gcard-icon">📦</div>
             <div class="gcard-num" id="gc-stock">0</div>
             <div class="gcard-name">재고</div>
-          </div>
-          <div class="gcard gc-notice" onclick="setFilter('notice')">
-            <div class="gcard-icon">📢</div>
-            <div class="gcard-num" id="gc-notice">0</div>
-            <div class="gcard-name">공지</div>
           </div>
         </div>
 
@@ -1193,6 +1321,42 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
       </div>
     </div>
 
+    <!-- ── NOTICE PAGE ──────────────────────── -->
+    <div class="page" id="page-notice">
+      <div id="notice-main">
+        <div class="today-header">
+          <div class="today-title">📢 공지사항</div>
+        </div>
+        <div id="notice-list"></div>
+      </div>
+    </div>
+
+    <!-- ── USER PAGE ────────────────────────── -->
+    <div class="page" id="page-user">
+      <div id="user-main">
+        <div class="today-header">
+          <div class="today-title">👤 내 계정</div>
+        </div>
+        <div class="user-section">
+          <div class="user-section-title">계정 정보</div>
+          <div class="user-info-row"><span class="user-info-label">아이디</span><span class="user-info-val" id="user-id-display"></span></div>
+          <div class="user-info-row"><span class="user-info-label">역할</span><span class="user-info-val" id="user-role-display"></span></div>
+          <div class="user-info-row"><span class="user-info-label">팀</span><span class="user-info-val" id="user-team-display" style="color:var(--c-stock)">-</span></div>
+        </div>
+        <div class="user-section">
+          <div class="user-section-title">비밀번호 변경</div>
+          <div class="f-label">현재 비밀번호</div>
+          <input class="f-input" id="pw-cur" type="password" placeholder="현재 비밀번호">
+          <div class="f-label" style="margin-top:10px">새 비밀번호</div>
+          <input class="f-input" id="pw-new" type="password" placeholder="새 비밀번호 (6자 이상)">
+          <div class="f-label" style="margin-top:10px">새 비밀번호 확인</div>
+          <input class="f-input" id="pw-new2" type="password" placeholder="새 비밀번호 재입력">
+          <button class="user-save-btn" id="pw-change-btn" style="margin-top:14px">비밀번호 변경</button>
+          <div class="user-msg" id="pw-msg"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── HELP PAGE ───────────────────────── -->
     <div class="page" id="page-help">
       <div style="width:100%;max-width:760px;margin:0 auto;">
@@ -1235,7 +1399,7 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
           <div class="help-card">
             <div class="help-card-title">항목 카드의 상태 버튼으로 전환</div>
             <div class="help-card-desc">
-              업무: 우선 → 단기 → 장기 → 완료 순으로 전환 (완료 시 취소선 표시)<br>
+              업무: 우선/단기/장기 중 자유롭게 지정 (사용자·관리자 모두 가능). 완료 버튼으로 완료 처리 (일반 사용자는 관리자 승인 후 적용).<br>
               업무 → Issue Log: 업무 항목의 <strong style="color:var(--c-issue)">⚠ Issue화</strong> 버튼 클릭 → Issue Log 진행중으로 이동<br>
               Issue Log: 진행중 → 해결완료 → TS작성완료 순으로 전환<br>
               필요 물품: 필요 → 구매예정 → 구매완료 순으로 전환<br>
@@ -1258,6 +1422,14 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
       <div style="width:100%;max-width:700px;margin:0 auto;">
         <div class="admin-title">관리자</div>
         <div class="admin-sub">계정 및 시스템 관리</div>
+
+        <!-- Pending Approvals -->
+        <div class="admin-section" id="pending-section" style="display:none">
+          <div class="admin-section-title" style="color:#f0c040">⏳ 승인 대기 항목</div>
+          <div class="admin-card" id="pending-list-wrap">
+            <div id="pending-list"></div>
+          </div>
+        </div>
 
         <!-- Stats -->
         <div class="admin-section">
@@ -1291,6 +1463,13 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
                   <option value="user">일반</option>
                   <option value="admin">관리자</option>
                 </select>
+                <select class="role-select" id="new-team">
+                  <option value="">팀 없음</option>
+                  <option value="전극공정">전극공정</option>
+                  <option value="조립공정">조립공정</option>
+                  <option value="화성공정">화성공정</option>
+                  <option value="모듈팩공정">모듈팩공정</option>
+                </select>
               </div>
               <button class="add-btn" onclick="addAccount()">계정 추가</button>
               <div style="font-size:11px;color:var(--tx3);margin-top:4px;" id="acct-msg"></div>
@@ -1321,9 +1500,10 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
   <!-- Mobile bottom nav -->
   <div id="bottom-nav">
     <button class="bnav-btn" data-bnav="today"><div class="bnav-icon">⚡</div><div class="bnav-label">투데이</div></button>
+    <button class="bnav-btn" data-bnav="notice"><div class="bnav-icon">📢</div><div class="bnav-label">공지</div></button>
     <button class="bnav-btn active" data-bnav="dash"><div class="bnav-icon">📋</div><div class="bnav-label">대시보드</div></button>
     <button class="bnav-btn" data-bnav="ai"><div class="bnav-icon">✦</div><div class="bnav-label">AI 입력</div></button>
-    <button class="bnav-btn" data-bnav="help"><div class="bnav-icon">📖</div><div class="bnav-label">사용방법</div></button>
+    <button class="bnav-btn" data-bnav="user"><div class="bnav-icon">👤</div><div class="bnav-label">내 계정</div></button>
     <button class="bnav-btn" data-bnav="admin"><div class="bnav-icon">⚙️</div><div class="bnav-label">관리자</div></button>
   </div>
 
@@ -1372,6 +1552,21 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
   </div>
 </div>
 
+<!-- ══ DUPLICATE CHECK POPUP ══════════════ -->
+<div id="dup-overlay">
+  <div class="popup-box" style="max-width:460px">
+    <div class="popup-title" style="color:var(--s-inprog)">⚠ 유사 항목 발견</div>
+    <div class="popup-sub">입력하신 내용과 매우 유사한 항목이 이미 있습니다.</div>
+    <div id="dup-new-text" style="background:var(--sur2);border:1px solid var(--acc);border-radius:9px;padding:10px 13px;font-size:13px;margin:10px 0 4px;color:var(--tx)"></div>
+    <div style="font-size:10px;color:var(--tx3);margin-bottom:8px;letter-spacing:.5px;font-weight:700;text-transform:uppercase">기존 유사 항목</div>
+    <div id="dup-existing-list" style="display:flex;flex-direction:column;gap:7px;max-height:180px;overflow-y:auto;margin-bottom:14px"></div>
+    <div class="popup-actions">
+      <button class="pop-cancel" id="dup-cancel">그래도 추가</button>
+      <button class="pop-confirm" id="dup-view">기존 항목 열기</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
 'use strict';
@@ -1391,6 +1586,11 @@ var CAT_GROUP = {
   long:        'task',
   periodic:    'task',
   'task-done': 'task',
+  'pending-priority': 'task',   // 승인 대기: 우선 업무
+  'pending-done':     'task',   // 승인 대기: 완료
+  'pending-planned':  'supply', // 승인 대기: 구매예정
+  'pending-bought':   'supply', // 승인 대기: 구매완료
+  'pending-notice':   'notice', // 승인 대기: 공지사항
   inprog:      'issue',
   solved:      'issue',
   'ts-done':   'issue',
@@ -1400,6 +1600,23 @@ var CAT_GROUP = {
   bought:      'supply',
   stock:       'stock',
   notice:      'notice'
+};
+
+// Statuses that require admin approval (non-admin triggers pending)
+var NEEDS_APPROVAL = {
+  priority:    'pending-priority',
+  'task-done': 'pending-done',
+  planned:     'pending-planned',
+  bought:      'pending-bought',
+  notice:      'pending-notice'
+};
+// Reverse: pending → target
+var APPROVAL_TARGET = {
+  'pending-priority': 'priority',
+  'pending-done':     'task-done',
+  'pending-planned':  'planned',
+  'pending-bought':   'bought',
+  'pending-notice':   'notice'
 };
 
 var STATUS_META = {
@@ -1416,7 +1633,12 @@ var STATUS_META = {
   planned:     { label: '구매예정',      icon: '🗓', bc: 'b-planned',  group: 'supply' },
   bought:      { label: '구매완료',      icon: '✅', bc: 'b-bought',   group: 'supply' },
   stock:       { label: '재고',          icon: '📦', bc: 'b-stock',    group: 'stock'  },
-  notice:      { label: '공지',          icon: '📢', bc: 'b-notice',   group: 'notice' }
+  notice:      { label: '공지',          icon: '📢', bc: 'b-notice',   group: 'notice' },
+  'pending-priority': { label: '승인대기(우선)', icon: '⏳', bc: 'b-pending', group: 'task'   },
+  'pending-done':     { label: '승인대기(완료)', icon: '⏳', bc: 'b-pending', group: 'task'   },
+  'pending-planned':  { label: '승인대기(구매예정)', icon: '⏳', bc: 'b-pending', group: 'supply' },
+  'pending-bought':   { label: '승인대기(구매완료)', icon: '⏳', bc: 'b-pending', group: 'supply' },
+  'pending-notice':   { label: '승인대기(공지)', icon: '⏳', bc: 'b-pending', group: 'notice' }
 };
 
 // Next status transitions
@@ -1447,6 +1669,130 @@ var GROUP_META = {
   stock:  { label: '재고',           icon: '📦', color: 'var(--c-stock)'  },
   notice: { label: '공지사항',       icon: '📢', color: 'var(--c-notice)' }
 };
+
+/* ── 재고 분류 (공정 × 물품구분) ──────────── */
+// 공정 목록
+var STOCK_PROCESSES = [
+  '전극 공정',
+  '조립 공정',
+  '화성 공정',
+  '모듈·팩 공정',
+  '(공정 외)'
+];
+
+// 물품 구분 목록
+var STOCK_MATERIAL_TYPES = [
+  '소재',
+  '부품',
+  '반제품',
+  '완제품'
+];
+
+// 공정별 물품구분 → 세부 품목 매핑
+var STOCK_CATALOG = {
+  '전극 공정': {
+    '소재': {
+      '양극 활물질':   ['NCM(니켈코발트망간)','NCA(니켈코발트알루미늄)','LFP(리튬인산철)','LCO(리튬코발트산화물)','기타 양극 활물질'],
+      '음극 활물질':   ['천연흑연','인조흑연','실리콘(Si)','SiO계','기타 음극 활물질'],
+      '도전재':        ['카본블랙(CB)','탄소나노튜브(CNT)','흑연(도전재용)','기타 도전재'],
+      '바인더':        ['PVDF(양극용)','CMC(음극용)','SBR(음극용)','기타 바인더'],
+      '용매':          ['NMP(N-메틸피롤리돈)','증류수','에탄올','기타 용매']
+    },
+    '부품': {
+      'Foil':          ['알루미늄 foil(양극집전체)','구리 foil(음극집전체)','기타 foil'],
+      '공정 소모품':   ['코터 닥터블레이드','슬롯다이 노즐','믹싱 블레이드','기타 소모품']
+    },
+    '반제품': {
+      '슬러리':        ['양극 슬러리','음극 슬러리','기타 슬러리'],
+      '전극':          ['양극 전극 롤(미슬리팅)','음극 전극 롤(미슬리팅)',
+                        '양극 전극(슬리팅 완료)','음극 전극(슬리팅 완료)',
+                        '양극 전극(노칭 완료)','음극 전극(노칭 완료)']
+    },
+    '완제품': {}
+  },
+
+  '조립 공정': {
+    '소재': {
+      '전해질':        ['전해액(LiPF6계)','전해액(LiTFSI계)','고체전해질(황화물계)','고체전해질(산화물계)','전해액 첨가제']
+    },
+    '부품': {
+      '분리막':        ['PE 분리막','PP 분리막','PE/PP 다층 분리막','세라믹코팅(CCS) 분리막','기타 분리막'],
+      'Tab·리드':      ['알루미늄 tab(양극)','니켈 tab(음극)','니켈도금 구리 tab','리드 필름(알루미늄)','리드 필름(니켈)'],
+      '케이스·용기':   ['알루미늄 파우치 필름','원통형 캔(알루미늄)','원통형 캔(강판)','각형 캔(알루미늄)','각형 캔(SUS)'],
+      '가스켓·씰링':   ['원통형 가스켓','각형 가스켓','절연 테이프','부타일 고무 씰','기타 씰링재']
+    },
+    '반제품': {
+      '전극 스택·젤리롤': ['원통형 젤리롤','각형 젤리롤','파우치형 전극 스택(Z-폴딩)','파우치형 전극 스택(라미네이션)'],
+      '탭 용접체':     ['초음파 용접 탭 조립체','레이저 용접 탭 조립체'],
+      '케이스 봉합체': ['전해액 미주입 셀 조립체','진공 건조 완료 셀']
+    },
+    '완제품': {}
+  },
+
+  '화성 공정': {
+    '소재': {},
+    '부품': {},
+    '반제품': {
+      '화성 진행 셀':  ['초기 충전 중 셀','1차 충방전 완료 셀','고온 에이징 중 셀(45°C)','상온 에이징 중 셀'],
+      '검사 대기 셀':  ['OCV 측정 대기','DCIR 측정 대기','용량 선별 대기','자가방전 검사 대기']
+    },
+    '완제품': {
+      '출하 전 셀':    ['등급 A 셀(표준 용량)','등급 B 셀(저용량)','등급 C 셀(불량 처리 대기)']
+    }
+  },
+
+  '모듈·팩 공정': {
+    '소재': {
+      '접착·절연':     ['열전도 패드','절연 패드','셀 간 스페이서','구조용 접착제','기타 접착·절연재']
+    },
+    '부품': {
+      '버스바·연결재': ['알루미늄 버스바','구리 버스바','플렉서블 연결재','기타 버스바'],
+      'BMS 부품':      ['BMS 기판(PCB)','전류 센서','온도 센서(NTC)','퓨즈·릴레이','커넥터·하네스'],
+      '냉각 부품':     ['냉각 플레이트(알루미늄)','냉각 호스·피팅','써멀 인터페이스 재료(TIM)','기타 냉각 부품'],
+      '구조 부품':     ['모듈 하우징','팩 케이스(상판)','팩 케이스(하판)','엔드 플레이트','사이드 플레이트']
+    },
+    '반제품': {
+      '모듈 반제품':   ['셀 적층 완료 모듈','버스바 용접 완료 모듈','BMS 장착 완료 모듈','모듈 기능 검사 완료'],
+      '팩 반제품':     ['모듈 적재 완료 팩','냉각 시스템 조립 팩','BMS 연결 완료 팩','팩 씰링 완료']
+    },
+    '완제품': {
+      '모듈':          ['EV용 표준 모듈','ESS용 대형 모듈','소형 모듈','기타 모듈'],
+      '팩':            ['EV용 배터리 팩','ESS용 배터리 팩','소형 배터리 팩','기타 팩']
+    }
+  },
+
+  '(공정 외)': {
+    '소재': {
+      '기타 소재':     ['기타 소재 (직접 입력)']
+    },
+    '부품': {
+      '기타 부품':     ['기타 부품 (직접 입력)']
+    },
+    '반제품': {
+      '기타 반제품':   ['기타 반제품 (직접 입력)']
+    },
+    '완제품': {
+      '기타 완제품':   ['기타 완제품 (직접 입력)']
+    }
+  }
+};
+
+// 헬퍼 함수들
+function getStockMaterialTypes(process) {
+  var p = STOCK_CATALOG[process];
+  if (!p) return STOCK_MATERIAL_TYPES;
+  return STOCK_MATERIAL_TYPES.filter(function(m){ return p[m] && Object.keys(p[m]).length > 0; });
+}
+function getStockSubs(process, material) {
+  var p = STOCK_CATALOG[process];
+  if (!p || !p[material]) return [];
+  return Object.keys(p[material]);
+}
+function getStockItems(process, material, sub) {
+  var p = STOCK_CATALOG[process];
+  if (!p || !p[material] || !p[material][sub]) return [];
+  return p[material][sub];
+}
 
 /* ═══════════════════════════════════════════
    STORAGE HELPERS
@@ -1503,10 +1849,10 @@ function doLogin() {
     document.getElementById('lp').focus();
     return;
   }
-  var sess = JSON.stringify({ id: id, role: accts[id].role, ts: Date.now() });
+  var sess = JSON.stringify({ id: id, role: accts[id].role, team: accts[id].team||'', ts: Date.now() });
   if (rem) { localStorage.setItem('ws-session', sess); sessionStorage.removeItem('ws-session'); }
   else     { sessionStorage.setItem('ws-session', sess); localStorage.removeItem('ws-session'); }
-  currentUser = { id: id, role: accts[id].role };
+  currentUser = { id: id, role: accts[id].role, team: accts[id].team||'' };
   startApp();
 }
 
@@ -1529,6 +1875,91 @@ function showPage(p) {
   document.querySelectorAll('.bnav-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.bnav === p); });
   if (p === 'admin') renderAdmin();
   if (p === 'today') renderToday();
+  if (p === 'notice') renderNotice();
+  if (p === 'user') renderUser();
+}
+
+/* ─── Keyword filter ─────────────────── */
+var kwFilterActive = null;
+function setKwFilter(kw) {
+  kwFilterActive = kw;
+  var bar = document.getElementById('kw-filter-bar');
+  var lbl = document.getElementById('kw-filter-label');
+  if (bar) bar.classList.add('on');
+  if (lbl) lbl.textContent = '키워드 검색: ' + kw;
+  render();
+}
+function clearKwFilter() {
+  kwFilterActive = null;
+  var bar = document.getElementById('kw-filter-bar');
+  if (bar) bar.classList.remove('on');
+  render();
+}
+
+/* ─── Notice page ───────────────────── */
+function renderNotice() {
+  var list = document.getElementById('notice-list');
+  if (!list) return;
+  var notices = items.filter(function(x){ return x.status === 'notice'; })
+                     .sort(function(a,b){ return b.ts - a.ts; });
+  if (notices.length === 0) {
+    list.innerHTML = '<div class="today-empty" style="padding:30px 0">공지사항이 없습니다.</div>';
+    return;
+  }
+  list.innerHTML = notices.map(function(itm){
+    var ago = Math.floor((Date.now()-itm.ts)/3600000);
+    var agoStr = ago < 1 ? '방금 전' : ago < 24 ? ago+'시간 전' : Math.floor(ago/24)+'일 전';
+    return '<div class="item notice-card" data-id="'+itm.id+'" style="margin-bottom:10px;cursor:pointer">'
+      + '<div class="item-body" style="padding-left:4px">'
+      + '<div class="item-text" style="font-size:14px;font-weight:600">'+esc(itm.text)+'</div>'
+      + (itm.memo?'<div style="font-size:12px;color:var(--tx3);margin-top:4px;line-height:1.5">'+esc(itm.memo.slice(0,120))+(itm.memo.length>120?'…':'')+'</div>':'')
+      + '<div class="item-meta" style="margin-top:6px"><span class="item-time">'+agoStr+'</span></div>'
+      + '</div></div>';
+  }).join('');
+  list.querySelectorAll('.notice-card').forEach(function(card){
+    card.addEventListener('click', function(){
+      var found = items.filter(function(x){ return x.id===this.dataset.id; }.bind(this))[0];
+      if (found) openDrawer(found);
+    });
+  });
+}
+
+/* ─── User page ─────────────────────── */
+function renderUser() {
+  var idEl = document.getElementById('user-id-display');
+  var roleEl = document.getElementById('user-role-display');
+  var teamEl = document.getElementById('user-team-display');
+  if (idEl) idEl.textContent = currentUser ? currentUser.id : '';
+  if (roleEl) roleEl.textContent = currentUser ? (currentUser.role === 'admin' ? '관리자' : '일반 사용자') : '';
+  if (teamEl) teamEl.textContent = currentUser && currentUser.team ? currentUser.team : '미배정';
+
+  var pwBtn = document.getElementById('pw-change-btn');
+  if (pwBtn && !pwBtn._bound) {
+    pwBtn._bound = true;
+    pwBtn.addEventListener('click', function(){
+      var cur = document.getElementById('pw-cur').value;
+      var nw = document.getElementById('pw-new').value;
+      var nw2 = document.getElementById('pw-new2').value;
+      var msg = document.getElementById('pw-msg');
+      var accts = getAccounts();
+      if (!currentUser || !accts[currentUser.id]) return;
+      if (accts[currentUser.id].pw !== cur) {
+        msg.style.color='var(--s-priority)'; msg.textContent='현재 비밀번호가 틀렸습니다.'; return;
+      }
+      if (nw.length < 6) {
+        msg.style.color='var(--s-priority)'; msg.textContent='새 비밀번호는 6자 이상이어야 합니다.'; return;
+      }
+      if (nw !== nw2) {
+        msg.style.color='var(--s-priority)'; msg.textContent='새 비밀번호가 일치하지 않습니다.'; return;
+      }
+      accts[currentUser.id].pw = nw;
+      saveAccounts(accts);
+      msg.style.color='var(--s-long)'; msg.textContent='✓ 비밀번호가 변경되었습니다.';
+      document.getElementById('pw-cur').value='';
+      document.getElementById('pw-new').value='';
+      document.getElementById('pw-new2').value='';
+    });
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -1656,20 +2087,38 @@ function renderCounts() {
     var g = CAT_GROUP[it.status];
     if (g && gc[g] !== undefined) gc[g]++;
   });
-  ['task','issue','idea','supply','stock','notice'].forEach(function(k){
-    document.getElementById('gc-'+k).textContent = gc[k];
+  ['task','issue','idea','supply','stock'].forEach(function(k){
+    var el = document.getElementById('gc-'+k);
+    if (el) el.textContent = gc[k];
   });
 }
 
 function renderList() {
-  // Filter
+  // Filter by category
   var filtered = items;
   if (curFilter !== 'all') {
-    if (['task','issue','idea','supply','stock'].indexOf(curFilter) > -1) {
+    if (curFilter.indexOf('stock-mat-') === 0) {
+      var matFilter = curFilter.replace('stock-mat-','');
+      filtered = items.filter(function(x){ return x.status==='stock' && x.stockData && x.stockData.material===matFilter; });
+    } else if (curFilter.indexOf('stock-') === 0) {
+      var seriesFilter = curFilter.replace('stock-','');
+      filtered = items.filter(function(x){ return x.status==='stock' && x.stockData && x.stockData.process===seriesFilter; });
+    } else if (['task','issue','idea','supply','stock'].indexOf(curFilter) > -1) {
       filtered = items.filter(function(x){ return CAT_GROUP[x.status] === curFilter; });
     } else {
       filtered = items.filter(function(x){ return x.status === curFilter; });
     }
+  } else {
+    // 전체 보기일 때도 공지사항은 대시보드에서 제외 (공지탭에서만 표시)
+    filtered = items.filter(function(x){ return x.status !== 'notice'; });
+  }
+  // Filter by keyword
+  if (kwFilterActive) {
+    var kw = kwFilterActive.toLowerCase();
+    filtered = filtered.filter(function(x){
+      return (x.text||'').toLowerCase().indexOf(kw) > -1
+          || (x.memo||'').toLowerCase().indexOf(kw) > -1;
+    });
   }
 
   document.getElementById('list-cnt').textContent = filtered.length + '개';
@@ -1690,6 +2139,7 @@ function renderList() {
     var nextS  = NEXT_STATUS[itm.status];
     var nextSM = nextS ? STATUS_META[nextS] : null;
     var isTask = TASK_STATUSES.indexOf(itm.status) > -1;
+    var isSupply = grp === 'supply';
     var hasImg = itm.img && itm.img.length > 10;
 
     html += '<div class="item" id="itm-'+itm.id+'" data-id="'+itm.id+'">';
@@ -1712,7 +2162,23 @@ function renderList() {
       html += '<img class="item-img-thumb" src="'+itm.img+'" alt="첨부" onclick="event.stopPropagation();openLightbox(\''+itm.id+'\')">';
     }
     html += '<div class="item-meta"><span class="item-time">'+fmtDate(itm.ts)+'</span>';
-    if (itm.memo) html += '<span style="font-size:10px;color:var(--tx3)">📝 메모 있음</span>';
+    // 작성자
+    var creator = (itm.editLog && itm.editLog[0] && itm.editLog[0].user) ? itm.editLog[0].user : null;
+    if (creator) html += '<span class="item-author">@'+esc(creator)+'</span>';
+    // 재고일 경우 계열 + 현재 재고량
+    if (itm.status === 'stock' && itm.stockData) {
+      var sd = itm.stockData;
+      var tIn  = (sd.inRecords||[]).reduce(function(a,r){return a+(r.qty||0);},0);
+      var tOut = (sd.outRecords||[]).reduce(function(a,r){return a+(r.qty||0);},0);
+      var cQty = (sd.qty||0)+tIn-tOut;
+      var qColor = cQty<=0?'var(--s-priority)':cQty<10?'var(--s-inprog)':'var(--c-stock)';
+      var seriesLabel = [sd.process, sd.material, sd.sub, sd.item].filter(Boolean).join(' · ');
+      if (seriesLabel) html += '<span class="stock-series-tag" style="font-size:9px">'+esc(seriesLabel)+'</span>';
+      html += '<span style="font-size:11px;font-weight:700;color:'+qColor+'">'+cQty+' '+(sd.unit||'g')+'</span>';
+    }
+    if (itm.memo) html += '<span style="font-size:10px;color:var(--tx3)">📝</span>';
+    if (isSupply && itm.purchaseData && itm.purchaseData.link) html += '<span style="font-size:10px;color:var(--c-supply)" title="구매링크 있음">🔗</span>';
+    if (isSupply && itm.purchaseData && itm.purchaseData.imgs && itm.purchaseData.imgs.length) html += '<span style="font-size:10px;color:var(--tx3)" title="사진 첨부">📷 '+itm.purchaseData.imgs.length+'</span>';
     html += '</div>';
     html += '</div>';
 
@@ -1722,20 +2188,25 @@ function renderList() {
   });
   el.innerHTML = html;
 
-  // Bind status transition
+  // Bind status transition (with admin approval)
   el.querySelectorAll('.status-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
       var id = this.dataset.id; var next = this.dataset.next;
+      var isAdmin = currentUser && currentUser.role === 'admin';
+      // Non-admin: certain transitions go to pending
+      var effectiveNext = (!isAdmin && NEEDS_APPROVAL[next]) ? NEEDS_APPROVAL[next] : next;
       items.forEach(function(it){
         if(it.id===id){
           var prev = it.status;
-          it.status = next;
+          it.status = effectiveNext;
           it.editLog = it.editLog||[];
-          it.editLog.push({ ts:Date.now(), type:'status', user:currentUser.id,
-            desc: (STATUS_META[prev]?STATUS_META[prev].label:'?') + ' → ' + (STATUS_META[next]?STATUS_META[next].label:'?') });
+          var desc = (STATUS_META[prev]?STATUS_META[prev].label:'?') + ' → ' + (STATUS_META[effectiveNext]?STATUS_META[effectiveNext].label:'?');
+          if (effectiveNext !== next) desc += ' (승인 대기중)';
+          it.editLog.push({ ts:Date.now(), type:'status', user:currentUser.id, desc:desc });
         }
       });
       saveItems(items); render();
+      if (effectiveNext !== next) showToast('⏳ 관리자 승인 후 적용됩니다.');
     });
   });
   // Bind Issue화 button
@@ -1791,7 +2262,18 @@ var SUB_FILTERS = {
     { f:'planned', label:'🗓 구매예정' },
     { f:'bought',  label:'✅ 구매완료' }
   ],
-  stock:  [{ f:'stock',  label:'📦 재고' }],
+  stock:  [
+    { f:'stock',                label:'📦 전체' },
+    { f:'stock-전극 공정',      label:'전극 공정' },
+    { f:'stock-조립 공정',      label:'조립 공정' },
+    { f:'stock-화성 공정',      label:'화성 공정' },
+    { f:'stock-모듈·팩 공정',   label:'모듈·팩' },
+    { f:'stock-(공정 외)',       label:'기타' },
+    { f:'stock-mat-소재',       label:'∙ 소재' },
+    { f:'stock-mat-부품',       label:'∙ 부품' },
+    { f:'stock-mat-반제품',     label:'∙ 반제품' },
+    { f:'stock-mat-완제품',     label:'∙ 완제품' }
+  ],
   notice: [{ f:'notice', label:'📢 공지사항' }]
 };
 
@@ -1843,6 +2325,8 @@ function renderFilterBar() {
 
 // gcard click: set group context + default to group filter
 window.setFilter = function(grp) {
+  // notice 클릭 → 공지탭으로 이동
+  if (grp === 'notice') { showPage('notice'); return; }
   curGroupCtx = grp;
   curFilter   = grp; // show full group by default
   renderFilterBar();
@@ -1871,7 +2355,70 @@ function convertToIssue(itm) {
 /* ═══════════════════════════════════════════
    CLASSIFY POPUP (업무 분류 확인 팝업)
 ═══════════════════════════════════════════ */
-var popupQueue   = [];  // [{id, text, status}] — items waiting for confirmation
+/* ═══════════════════════════════════════════
+   DUPLICATE DETECTION
+═══════════════════════════════════════════ */
+function textSimilarity(a, b) {
+  // Jaccard similarity on word tokens
+  function tok(s){ return (s||'').toLowerCase().replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g,' ').split(/\s+/).filter(function(w){ return w.length>1; }); }
+  var ta = tok(a), tb = tok(b);
+  if(!ta.length||!tb.length) return 0;
+  var sa = {}, sb = {};
+  ta.forEach(function(w){ sa[w]=1; });
+  tb.forEach(function(w){ sb[w]=1; });
+  var inter = Object.keys(sa).filter(function(w){ return sb[w]; }).length;
+  var union = Object.keys(sa).length + Object.keys(sb).length - inter;
+  return union ? inter/union : 0;
+}
+
+var dupPendingItems = [];  // items waiting for dup confirmation
+var dupCurrentItem  = null;
+var dupCallback     = null;
+
+function checkDuplicate(newItem, onNoDup) {
+  var threshold = 0.55;
+  var similar = items.filter(function(x){
+    return x.id !== newItem.id && textSimilarity(newItem.text, x.text) >= threshold;
+  }).slice(0,3);
+
+  if (similar.length === 0) { onNoDup(); return; }
+
+  // Show dup popup
+  dupCurrentItem = newItem;
+  dupCallback    = onNoDup;
+  document.getElementById('dup-new-text').textContent = newItem.text;
+  var list = document.getElementById('dup-existing-list');
+  list.innerHTML = similar.map(function(x){
+    var sm = STATUS_META[x.status]||STATUS_META.priority;
+    var creator = (x.editLog&&x.editLog[0]&&x.editLog[0].user) ? ' @'+x.editLog[0].user : '';
+    return '<div class="related-card" style="cursor:default">'
+      + '<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">'
+      + '<span class="item-badge '+sm.bc+'" style="font-size:9px;padding:2px 6px">'+sm.icon+' '+sm.label+'</span>'
+      + '<span style="font-size:10px;color:var(--tx3)">'+creator+'</span>'
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--tx2)">'+esc(x.text)+'</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('dup-overlay').classList.add('open');
+}
+
+document.getElementById('dup-cancel').addEventListener('click', function(){
+  document.getElementById('dup-overlay').classList.remove('open');
+  if (dupCallback) dupCallback();
+  dupCurrentItem = null; dupCallback = null;
+});
+document.getElementById('dup-view').addEventListener('click', function(){
+  document.getElementById('dup-overlay').classList.remove('open');
+  // Open the first similar item's drawer
+  var threshold = 0.55;
+  if (dupCurrentItem) {
+    var first = items.filter(function(x){
+      return textSimilarity(dupCurrentItem.text, x.text) >= threshold;
+    })[0];
+    if (first) openDrawer(first);
+  }
+  dupCurrentItem = null; dupCallback = null;
+});
 var popupCurrent = null;
 
 function openClassifyPopup(newItems) {
@@ -1965,6 +2512,7 @@ function openDrawer(itm) {
   var isDone  = itm.status==='task-done'||itm.status==='solved'||itm.status==='bought'||itm.status==='ts-done';
   var isAdmin = currentUser && currentUser.role === 'admin';
   var isIssue = CAT_GROUP[itm.status] === 'issue';
+  var isStock = itm.status === 'stock';
 
   var badge = document.getElementById('drawer-badge');
   badge.className = 'item-badge ' + sm.bc;
@@ -1979,14 +2527,14 @@ function openDrawer(itm) {
   ════════════════════════════════ */
   html += '<div class="ds-section">';
 
-  // ── 키워드 (자동 생성 — 텍스트+메모에서 추출)
-  var kwWords = (itm.text+' '+(itm.memo||'')).replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g,' ').split(/\s+/).filter(function(w){ return w.length>1; });
-  // 중복 제거, 최대 6개
-  var kwUniq = kwWords.filter(function(w,i){ return kwWords.indexOf(w)===i; }).slice(0,6);
+  // ── 키워드 (2~3개: 가장 긴 고유 단어 우선)
+  var kwAll = (itm.text+' '+(itm.memo||'')).replace(/[^\uAC00-\uD7A3a-zA-Z0-9]/g,' ').split(/\s+/).filter(function(w){ return w.length>1; });
+  var kwUniq = kwAll.filter(function(w,i){ return kwAll.indexOf(w)===i; })
+    .sort(function(a,b){ return b.length-a.length; }).slice(0,3);
   if (kwUniq.length > 0) {
     html += '<div class="ds-keywords">';
     kwUniq.forEach(function(kw){
-      html += '<span class="ds-kw-tag">'+esc(kw)+'</span>';
+      html += '<span class="ds-kw-tag" data-kw="'+esc(kw)+'">'+esc(kw)+'</span>';
     });
     html += '</div>';
   }
@@ -2001,13 +2549,138 @@ function openDrawer(itm) {
   html += '</div>';
   html += '</div>'; // ds-content-row
 
-  // ── 메모 (항상 펼쳐진 인라인 편집)
-  html += '<div class="ds-memo-inline">';
+  // ── 메모 (내용 있으면 텍스트+연필 아이콘, 없으면 생략)
+  if (itm.memo) {
+    html += '<div class="ds-memo-view" id="ds-memo-view">';
+    html += '<span class="ds-memo-text">'+esc(itm.memo)+'</span>';
+    html += '<button class="ds-memo-edit-btn" id="ds-memo-edit-btn" title="메모 수정">✏️</button>';
+    html += '</div>';
+  } else {
+    html += '<button class="ds-memo-add-btn" id="ds-memo-edit-btn">+ 메모</button>';
+  }
+  html += '<div class="ds-memo-inline" id="ds-memo-inline" style="display:none">';
   html += '<textarea class="drawer-memo" id="drawer-memo" placeholder="메모, 원인 분석, 조치 사항 등...">'+esc(itm.memo||'')+'</textarea>';
-  html += '<div class="ds-memo-actions"><button class="drawer-memo-save" id="drawer-memo-save">저장</button></div>';
+  html += '<div class="ds-memo-actions"><button class="drawer-memo-save" id="drawer-memo-save">저장</button><button class="ds-memo-cancel" id="ds-memo-cancel">취소</button></div>';
   html += '</div>';
 
   html += '</div>'; // ds-section
+
+  /* ════════════════════════════════
+     SECTION 1.5: 재고 전용 (stock만)
+  ════════════════════════════════ */
+  if (isStock) {
+    var stockData = itm.stockData || { series:'소재', sub:'활물질', qty:0, unit:'g', inRecords:[], outRecords:[] };
+
+    html += '<hr class="drawer-divider">';
+    html += '<div class="ds-section">';
+    html += '<div class="ds-label" style="color:var(--c-stock)">📦 재고 정보</div>';
+
+    // 4단계: 공정 → 물품구분 → 중분류 → 소분류
+    var curProcess  = stockData.process  || '전극 공정';
+    var curMaterial = stockData.material || '소재';
+    var curSub      = stockData.sub      || '';
+    var curItem     = stockData.item     || '';
+
+    if (isAdmin) {
+      html += '<div class="stock-classify-grid">';
+      // 공정 선택
+      html += '<div class="stock-classify-col">';
+      html += '<div class="stock-classify-label">공정</div>';
+      html += '<select class="stock-sel" id="stock-process-sel">';
+      STOCK_PROCESSES.forEach(function(p){
+        html += '<option value="'+esc(p)+'"'+(curProcess===p?' selected':'')+'>'+esc(p)+'</option>';
+      });
+      html += '</select></div>';
+      // 물품 구분
+      var matTypes = getStockMaterialTypes(curProcess);
+      html += '<div class="stock-classify-col">';
+      html += '<div class="stock-classify-label">물품 구분</div>';
+      html += '<select class="stock-sel" id="stock-material-sel">';
+      matTypes.forEach(function(m){
+        html += '<option value="'+esc(m)+'"'+(curMaterial===m?' selected':'')+'>'+esc(m)+'</option>';
+      });
+      html += '</select></div>';
+      // 중분류
+      var curSubOpts = getStockSubs(curProcess, curMaterial);
+      html += '<div class="stock-classify-col">';
+      html += '<div class="stock-classify-label">중분류</div>';
+      html += '<select class="stock-sel" id="stock-sub-sel">';
+      curSubOpts.forEach(function(s){
+        html += '<option value="'+esc(s)+'"'+(curSub===s?' selected':'')+'>'+esc(s)+'</option>';
+      });
+      html += '</select></div>';
+      // 소분류
+      var curItemOpts = getStockItems(curProcess, curMaterial, curSub||curSubOpts[0]||'');
+      html += '<div class="stock-classify-col">';
+      html += '<div class="stock-classify-label">품목</div>';
+      html += '<select class="stock-sel" id="stock-item-sel">';
+      curItemOpts.forEach(function(s){
+        html += '<option value="'+esc(s)+'"'+(curItem===s?' selected':'')+'>'+esc(s)+'</option>';
+      });
+      html += '</select></div>';
+      html += '</div>'; // stock-classify-grid
+      html += '<div class="stock-unit-row"><span style="font-size:11px;color:var(--tx3)">단위</span>';
+      html += '<input class="stock-unit-input" id="stock-unit-input" type="text" value="'+esc(stockData.unit||'g')+'" placeholder="g / kg / 개 등" maxlength="8">';
+      html += '<button class="stock-save-btn" id="stock-meta-save">분류 저장</button></div>';
+    } else {
+      // 일반 사용자: 읽기 전용 태그 표시
+      html += '<div class="stock-series-row">';
+      var tags = [curProcess, curMaterial, curSub, curItem].filter(Boolean);
+      tags.forEach(function(t, i){
+        html += '<span class="stock-series-tag" style="opacity:'+(1 - i*0.15)+'">'+esc(t)+'</span>';
+      });
+      html += '<span class="stock-unit-badge">'+esc(stockData.unit||'g')+'</span>';
+      html += '</div>';
+    }
+
+    // 현재 재고량
+    var totalIn  = (stockData.inRecords||[]).reduce(function(a,r){ return a+(r.qty||0); }, 0);
+    var totalOut = (stockData.outRecords||[]).reduce(function(a,r){ return a+(r.qty||0); }, 0);
+    var curQty   = (stockData.qty||0) + totalIn - totalOut;
+    html += '<div class="stock-qty-display">';
+    html += '<span class="stock-qty-num" style="color:'+(curQty<=0?'var(--s-priority)':curQty<10?'var(--s-inprog)':'var(--c-stock)')+'">'+curQty+'</span>';
+    html += '<span class="stock-qty-unit">'+esc(stockData.unit||'g')+'</span>';
+    html += '<span style="font-size:10px;color:var(--tx3);margin-left:8px">현재 재고</span>';
+    html += '</div>';
+    if (isAdmin) {
+      html += '<div class="stock-edit-row">';
+      html += '<span style="font-size:11px;color:var(--tx3)">기준 재고</span>';
+      html += '<input class="stock-qty-input" id="stock-base-qty" type="number" min="0" value="'+(stockData.qty||0)+'">';
+      html += '<button class="stock-save-btn" id="stock-base-save">저장</button>';
+      html += '</div>';
+    }
+
+    // 입고/사용 기록 추가
+    html += '<div class="stock-record-row">';
+    html += '<button class="stock-record-btn in" id="stock-in-btn">📥 입고</button>';
+    html += '<input class="stock-qty-input" id="stock-record-qty" type="number" min="1" placeholder="수량">';
+    html += '<input class="stock-record-note" id="stock-record-note" type="text" placeholder="메모(선택)">';
+    html += '<button class="stock-record-btn out" id="stock-out-btn">📤 사용</button>';
+    html += '</div>';
+
+    // 기록 이력
+    var allRecords = []
+      .concat((stockData.inRecords||[]).map(function(r){ return {type:'in', r:r}; }))
+      .concat((stockData.outRecords||[]).map(function(r){ return {type:'out', r:r}; }))
+      .sort(function(a,b){ return b.r.ts - a.r.ts; });
+    if (allRecords.length > 0) {
+      html += '<div class="stock-history">';
+      html += '<div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">입출고 이력</div>';
+      allRecords.slice(0,10).forEach(function(rec){
+        var color = rec.type==='in'?'var(--c-supply)':'var(--s-priority)';
+        var label = rec.type==='in'?'📥 입고':'📤 사용';
+        html += '<div class="stock-rec-row">';
+        html += '<span style="font-size:10px;font-weight:700;color:'+color+'">'+label+'</span>';
+        html += '<span style="font-size:11px;font-weight:600;color:'+color+'">'+(rec.type==='in'?'+':'-')+rec.r.qty+' '+esc(stockData.unit||'g')+'</span>';
+        html += '<span style="font-size:10px;color:var(--tx3)">'+esc(rec.r.user||'')+'</span>';
+        html += '<span style="font-size:10px;color:var(--tx3)">'+fmtDate(rec.r.ts)+'</span>';
+        if (rec.r.note) html += '<span style="font-size:10px;color:var(--tx2)">'+esc(rec.r.note)+'</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>'; // ds-section
+  }
 
   /* ════════════════════════════════
      SECTION 2: 진행 이력 (Issue만)
@@ -2066,6 +2739,83 @@ function openDrawer(itm) {
   }
 
   /* ════════════════════════════════
+     SECTION 2.5: 구매 정보 (필요물품만)
+  ════════════════════════════════ */
+  var isSupply = CAT_GROUP[itm.status] === 'supply';
+  if (isSupply) {
+    var pd = itm.purchaseData || {};
+    html += '<hr class="drawer-divider">';
+    html += '<div class="ds-section">';
+    html += '<div class="ds-label" style="color:var(--c-supply)">🛒 구매 정보</div>';
+
+    // 구매 사진들
+    var pImgs = pd.imgs || [];
+    html += '<div class="purchase-imgs-row" id="purchase-imgs-row">';
+    pImgs.forEach(function(img, i){
+      html += '<div class="purchase-img-wrap">';
+      html += '<img class="purchase-thumb ds-thumb" src="'+img+'" alt="구매참고">';
+      html += '<button class="purchase-img-del" data-idx="'+i+'" title="삭제">✕</button>';
+      html += '</div>';
+    });
+    html += '<button class="purchase-img-add-btn" id="purchase-img-add-btn">📎 사진 추가</button>';
+    html += '<input type="file" id="purchase-img-input" accept="image/*" multiple style="display:none">';
+    html += '</div>';
+
+    // 구매 링크
+    html += '<div class="purchase-field-row">';
+    html += '<span class="purchase-field-label">🔗 구매링크</span>';
+    html += '<input class="purchase-field-input" id="purchase-link-input" type="url" placeholder="https://..." value="'+esc(pd.link||'')+'">';
+    if (pd.link) html += '<a class="purchase-link-open" href="'+esc(pd.link)+'" target="_blank" rel="noopener">열기 ↗</a>';
+    html += '</div>';
+
+    // 구매처/공급업체
+    html += '<div class="purchase-field-row">';
+    html += '<span class="purchase-field-label">🏭 공급업체</span>';
+    html += '<input class="purchase-field-input" id="purchase-vendor-input" type="text" placeholder="업체명, 담당자 등" value="'+esc(pd.vendor||'')+'">';
+    html += '</div>';
+
+    // 예상 단가
+    html += '<div class="purchase-field-row">';
+    html += '<span class="purchase-field-label">💰 예상 단가</span>';
+    html += '<input class="purchase-field-input" id="purchase-price-input" type="text" placeholder="예: 12,000원 / 개" value="'+esc(pd.price||'')+'">';
+    html += '</div>';
+
+    // 비고/설명
+    html += '<div class="purchase-field-col">';
+    html += '<span class="purchase-field-label">📝 비고</span>';
+    html += '<textarea class="purchase-note-textarea" id="purchase-note-input" placeholder="규격, 주의사항, 기타 참고사항...">'+esc(pd.note||'')+'</textarea>';
+    html += '</div>';
+
+    html += '<button class="purchase-save-btn" id="purchase-save-btn">저장</button>';
+    html += '</div>'; // ds-section
+  }
+
+  /* ════════════════════════════════
+     SECTION 3.5: 기한 설정 (업무 항목만)
+  ════════════════════════════════ */
+  var isTask = ['priority','short','long','periodic'].indexOf(itm.status) > -1;
+  if (isTask) {
+    html += '<hr class="drawer-divider">';
+    html += '<div class="ds-section">';
+    html += '<div class="ds-label">📅 기한</div>';
+    var dueDateVal = itm.dueDate ? new Date(itm.dueDate).toISOString().slice(0,10) : '';
+    var dueTxt = '';
+    if (itm.dueDate) {
+      var dDiff = Math.ceil((itm.dueDate - Date.now()) / 86400000);
+      var dColor = dDiff < 0 ? 'var(--s-priority)' : dDiff <= 3 ? 'var(--s-inprog)' : 'var(--tx2)';
+      dueTxt = '<span style="font-size:11px;font-weight:700;color:'+dColor+';margin-left:8px">'
+        + (dDiff < 0 ? '기한 초과 '+Math.abs(dDiff)+'일' : dDiff===0 ? 'D-Day' : 'D-'+dDiff) + '</span>';
+    }
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+    html += '<input type="date" class="due-date-input" id="due-date-input" value="'+dueDateVal+'">';
+    html += dueTxt;
+    html += '<button class="due-date-save" id="due-date-save">저장</button>';
+    if (itm.dueDate) html += '<button class="due-date-clear" id="due-date-clear">삭제</button>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  /* ════════════════════════════════
      SECTION 3: 댓글
   ════════════════════════════════ */
   html += '<hr class="drawer-divider">';
@@ -2098,31 +2848,6 @@ function openDrawer(itm) {
   html += '</div>';
 
   html += '</div>'; // ds-section
-
-  /* ════════════════════════════════
-     SECTION 3.5: 기한 설정 (업무 항목만)
-  ════════════════════════════════ */
-  var isTask = ['priority','short','long','periodic'].indexOf(itm.status) > -1;
-  if (isTask) {
-    html += '<hr class="drawer-divider">';
-    html += '<div class="ds-section">';
-    html += '<div class="ds-label">📅 기한</div>';
-    var dueDateVal = itm.dueDate ? new Date(itm.dueDate).toISOString().slice(0,10) : '';
-    var dueTxt = '';
-    if (itm.dueDate) {
-      var dDiff = Math.ceil((itm.dueDate - Date.now()) / 86400000);
-      var dColor = dDiff < 0 ? 'var(--s-priority)' : dDiff <= 3 ? 'var(--s-inprog)' : 'var(--tx2)';
-      dueTxt = '<span style="font-size:11px;font-weight:700;color:'+dColor+';margin-left:8px">'
-        + (dDiff < 0 ? '기한 초과 '+Math.abs(dDiff)+'일' : dDiff===0 ? 'D-Day' : 'D-'+dDiff) + '</span>';
-    }
-    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
-    html += '<input type="date" class="due-date-input" id="due-date-input" value="'+dueDateVal+'">';
-    html += dueTxt;
-    html += '<button class="due-date-save" id="due-date-save">저장</button>';
-    if (itm.dueDate) html += '<button class="due-date-clear" id="due-date-clear">삭제</button>';
-    html += '</div>';
-    html += '</div>';
-  }
 
   /* ════════════════════════════════
      SECTION 4: 연관 항목
@@ -2274,6 +2999,68 @@ function openDrawer(itm) {
     });
   }
 
+  // ── 구매정보 섹션 바인딩
+  if (isSupply) {
+    var purchImgBtn = document.getElementById('purchase-img-add-btn');
+    var purchImgInput = document.getElementById('purchase-img-input');
+    if (purchImgBtn && purchImgInput) {
+      purchImgBtn.addEventListener('click', function(){ purchImgInput.click(); });
+      purchImgInput.addEventListener('change', function(){
+        var files = Array.prototype.slice.call(this.files);
+        var pending = files.length; if(!pending) return;
+        files.forEach(function(file){
+          var reader = new FileReader();
+          reader.onload = function(ev){
+            compressImage(ev.target.result, 1200, 0.72, function(compressed){
+              items.forEach(function(x){
+                if(x.id===drawerItemId){
+                  x.purchaseData = x.purchaseData||{ imgs:[], link:'', vendor:'', price:'', note:'' };
+                  x.purchaseData.imgs = x.purchaseData.imgs||[];
+                  x.purchaseData.imgs.push(compressed);
+                }
+              });
+              saveItems(items); pending--;
+              if(pending===0){ var upd=items.filter(function(x){return x.id===drawerItemId;})[0]; if(upd) openDrawer(upd); }
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+    }
+    bodyEl.querySelectorAll('.purchase-img-del').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var idx = parseInt(this.dataset.idx);
+        items.forEach(function(x){
+          if(x.id===drawerItemId && x.purchaseData && x.purchaseData.imgs) x.purchaseData.imgs.splice(idx,1);
+        });
+        saveItems(items);
+        var upd=items.filter(function(x){return x.id===drawerItemId;})[0]; if(upd) openDrawer(upd);
+      });
+    });
+    var purchSaveBtn = document.getElementById('purchase-save-btn');
+    if (purchSaveBtn) {
+      purchSaveBtn.addEventListener('click', function(){
+        var link   = (document.getElementById('purchase-link-input')||{}).value||'';
+        var vendor = (document.getElementById('purchase-vendor-input')||{}).value||'';
+        var price  = (document.getElementById('purchase-price-input')||{}).value||'';
+        var note   = (document.getElementById('purchase-note-input')||{}).value||'';
+        items.forEach(function(x){
+          if(x.id===drawerItemId){
+            x.purchaseData = x.purchaseData||{ imgs:[] };
+            x.purchaseData.link=link; x.purchaseData.vendor=vendor;
+            x.purchaseData.price=price; x.purchaseData.note=note;
+            x.editLog=x.editLog||[];
+            x.editLog.push({ ts:Date.now(), type:'edit', user:currentUser.id, desc:'구매 정보 수정' });
+          }
+        });
+        saveItems(items); render();
+        var upd=items.filter(function(x){return x.id===drawerItemId;})[0]; if(upd) openDrawer(upd);
+        showToast('\u2713 구매 정보 저장됨');
+      });
+    }
+  }
+
   // 연관 항목 클릭 (직접 링크된 것)
   bodyEl.querySelectorAll('.related-card[data-rel-id]').forEach(function(card){
     card.addEventListener('click', function(e){
@@ -2381,6 +3168,34 @@ function openDrawer(itm) {
       });
     });
   }
+  // 메모 편집 버튼 (연필 or + 메모)
+  var memoEditBtn = document.getElementById('ds-memo-edit-btn');
+  if (memoEditBtn) {
+    memoEditBtn.addEventListener('click', function(){
+      var view = document.getElementById('ds-memo-view');
+      var inline = document.getElementById('ds-memo-inline');
+      if (view) view.style.display = 'none';
+      if (inline) inline.style.display = 'block';
+      var ta = document.getElementById('drawer-memo');
+      if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+      if (this.classList.contains('ds-memo-add-btn')) this.style.display = 'none';
+    });
+  }
+  // 메모 취소
+  var memoCancelBtn = document.getElementById('ds-memo-cancel');
+  if (memoCancelBtn) {
+    memoCancelBtn.addEventListener('click', function(){
+      var view = document.getElementById('ds-memo-view');
+      var inline = document.getElementById('ds-memo-inline');
+      if (inline) inline.style.display = 'none';
+      if (view) view.style.display = 'flex';
+      else {
+        var addBtn = document.getElementById('ds-memo-edit-btn');
+        if (addBtn) addBtn.style.display = '';
+      }
+    });
+  }
+  // 메모 저장
   document.getElementById('drawer-memo-save').addEventListener('click', function(){
     var memo = document.getElementById('drawer-memo').value;
     items.forEach(function(x){
@@ -2391,9 +3206,149 @@ function openDrawer(itm) {
       }
     });
     saveItems(items); render();
-    this.textContent = '✓ 저장됨';
-    var btn = this; setTimeout(function(){ btn.textContent='저장'; }, 1600);
+    var upd = items.filter(function(x){ return x.id===drawerItemId; })[0];
+    if (upd) openDrawer(upd);
   });
+
+  // 키워드 클릭 → 대시보드 키워드 검색 필터
+  bodyEl.querySelectorAll('.ds-kw-tag').forEach(function(tag){
+    tag.addEventListener('click', function(){
+      var kw = this.dataset.kw;
+      closeDrawer();
+      showPage('dash');
+      setKwFilter(kw);
+    });
+  });
+
+  // ── 재고 섹션 바인딩
+  if (isStock) {
+    function updateSubSel(proc, mat) {
+      var subs = getStockSubs(proc, mat);
+      var subSel = document.getElementById('stock-sub-sel');
+      if (subSel) subSel.innerHTML = subs.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join('');
+      updateItemSel(proc, mat, subs[0]||'');
+    }
+    function updateItemSel(proc, mat, sub) {
+      var its = getStockItems(proc, mat, sub);
+      var itemSel = document.getElementById('stock-item-sel');
+      if (itemSel) itemSel.innerHTML = its.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join('');
+    }
+    function updateMaterialSel(proc) {
+      var mats = getStockMaterialTypes(proc);
+      var matSel = document.getElementById('stock-material-sel');
+      if (matSel) {
+        matSel.innerHTML = mats.map(function(m){ return '<option value="'+esc(m)+'">'+esc(m)+'</option>'; }).join('');
+        updateSubSel(proc, mats[0]||'소재');
+      }
+    }
+    // 공정 변경 cascade
+    var procSel = document.getElementById('stock-process-sel');
+    if (procSel) procSel.addEventListener('change', function(){ updateMaterialSel(this.value); });
+    // 물품구분 변경 cascade
+    var matSel = document.getElementById('stock-material-sel');
+    if (matSel) matSel.addEventListener('change', function(){
+      var proc = (procSel&&procSel.value)||'전극 공정';
+      updateSubSel(proc, this.value);
+    });
+    // 중분류 변경 cascade
+    var subSel = document.getElementById('stock-sub-sel');
+    if (subSel) subSel.addEventListener('change', function(){
+      var proc = (procSel&&procSel.value)||'전극 공정';
+      var mat  = (matSel&&matSel.value)||'소재';
+      updateItemSel(proc, mat, this.value);
+    });
+
+    // 분류 저장 (공정/물품/중분류/품목/단위)
+    var metaSaveBtn = document.getElementById('stock-meta-save');
+    if (metaSaveBtn) {
+      metaSaveBtn.addEventListener('click', function(){
+        items.forEach(function(x){
+          if(x.id===drawerItemId){
+            x.stockData = x.stockData || { qty:0, unit:'g', inRecords:[], outRecords:[] };
+            var sp = document.getElementById('stock-process-sel');
+            var sm = document.getElementById('stock-material-sel');
+            var sb = document.getElementById('stock-sub-sel');
+            var si = document.getElementById('stock-item-sel');
+            var su = document.getElementById('stock-unit-input');
+            if(sp) x.stockData.process  = sp.value;
+            if(sm) x.stockData.material = sm.value;
+            if(sb) x.stockData.sub      = sb.value;
+            if(si) x.stockData.item     = si.value;
+            if(su) x.stockData.unit     = su.value||'g';
+            x.editLog = x.editLog||[];
+            x.editLog.push({ ts:Date.now(), type:'edit', user:currentUser.id, desc:'재고 분류 수정' });
+          }
+        });
+        saveItems(items);
+        var upd = items.filter(function(x){ return x.id===drawerItemId; })[0];
+        if (upd) openDrawer(upd);
+        showToast('✓ 분류 저장됨');
+      });
+    }
+    // 기준 재고 저장
+    var baseSaveBtn = document.getElementById('stock-base-save');
+    if (baseSaveBtn) {
+      baseSaveBtn.addEventListener('click', function(){
+        items.forEach(function(x){
+          if(x.id===drawerItemId){
+            x.stockData = x.stockData || { qty:0, unit:'g', inRecords:[], outRecords:[] };
+            var sq = document.getElementById('stock-base-qty');
+            if(sq) x.stockData.qty = parseInt(sq.value)||0;
+            x.editLog = x.editLog||[];
+            x.editLog.push({ ts:Date.now(), type:'edit', user:currentUser.id, desc:'기준 재고 수정' });
+          }
+        });
+        saveItems(items);
+        var upd = items.filter(function(x){ return x.id===drawerItemId; })[0];
+        if (upd) openDrawer(upd);
+        showToast('✓ 기준 재고 저장됨');
+      });
+    }
+    // 입고 버튼
+    var inBtn = document.getElementById('stock-in-btn');
+    if (inBtn) {
+      inBtn.addEventListener('click', function(){
+        var qty = parseInt(document.getElementById('stock-record-qty').value)||0;
+        var note = document.getElementById('stock-record-note').value.trim();
+        if (qty <= 0) { showToast('수량을 입력해주세요.','var(--s-priority)'); return; }
+        items.forEach(function(x){
+          if(x.id===drawerItemId){
+            x.stockData = x.stockData || { qty:0, unit:'g', inRecords:[], outRecords:[] };
+            x.stockData.inRecords = x.stockData.inRecords||[];
+            x.stockData.inRecords.push({ ts:Date.now(), qty:qty, user:currentUser.id, note:note });
+            x.editLog = x.editLog||[];
+            x.editLog.push({ ts:Date.now(), type:'edit', user:currentUser.id, desc:'입고 +'+qty+(x.stockData.unit||'g') });
+          }
+        });
+        saveItems(items);
+        var upd = items.filter(function(x){ return x.id===drawerItemId; })[0];
+        if (upd) openDrawer(upd);
+        showToast('📥 입고 완료','var(--c-supply)');
+      });
+    }
+    // 사용(출고) 버튼
+    var outBtn = document.getElementById('stock-out-btn');
+    if (outBtn) {
+      outBtn.addEventListener('click', function(){
+        var qty = parseInt(document.getElementById('stock-record-qty').value)||0;
+        var note = document.getElementById('stock-record-note').value.trim();
+        if (qty <= 0) { showToast('수량을 입력해주세요.','var(--s-priority)'); return; }
+        items.forEach(function(x){
+          if(x.id===drawerItemId){
+            x.stockData = x.stockData || { qty:0, unit:'g', inRecords:[], outRecords:[] };
+            x.stockData.outRecords = x.stockData.outRecords||[];
+            x.stockData.outRecords.push({ ts:Date.now(), qty:qty, user:currentUser.id, note:note });
+            x.editLog = x.editLog||[];
+            x.editLog.push({ ts:Date.now(), type:'edit', user:currentUser.id, desc:'사용(출고) -'+qty+(x.stockData.unit||'g') });
+          }
+        });
+        saveItems(items);
+        var upd = items.filter(function(x){ return x.id===drawerItemId; })[0];
+        if (upd) openDrawer(upd);
+        showToast('📤 사용 기록 완료','var(--s-priority)');
+      });
+    }
+  }
 
   // 썸네일 → 라이트박스
   bodyEl.querySelectorAll('.ds-thumb').forEach(function(img){
@@ -2772,15 +3727,27 @@ async function sendMsg(suffix) {
     if (parsed.items&&parsed.items.length) {
       parsed.items.forEach(function(it,idx){
         if(it.text&&it.status&&STATUS_META[it.status]){
-          var ni = { id:genId(), text:it.text, status:it.status, ts:Date.now(), img:null,
+          // 공지사항: 관리자면 바로 notice, 일반 사용자면 pending-notice
+          var finalStatus = it.status;
+          if (it.status === 'notice' && currentUser && currentUser.role !== 'admin') {
+            finalStatus = 'pending-notice';
+          }
+          var ni = { id:genId(), text:it.text, status:finalStatus, ts:Date.now(), img:null,
                      memo:'', logs:[], comments:[],
+                     stockData: it.status==='stock' ? { series:'소재', sub:'활물질', qty:0, unit:'g', inRecords:[], outRecords:[] } : undefined,
                      editLog:[{ ts:Date.now(), type:'create', user: currentUser ? currentUser.id : 'system', desc:'항목 생성' }] };
           if(idx===0&&imgs.length>0) ni.img=imgs[0].dataUrl;
           newItems.push(ni);
-          items.push(ni);
+          // Duplicate check: push to items only after user confirms
+          (function(item){
+            checkDuplicate(item, function(){
+              items.push(item);
+              saveItems(items); render();
+            });
+          })(ni);
         }
       });
-      if(newItems.length){ saveItems(items); render(); }
+      if(newItems.length){ /* render happens inside checkDuplicate callback */ }
     }
 
     // Build reply
@@ -2815,7 +3782,110 @@ async function sendMsg(suffix) {
 /* ═══════════════════════════════════════════
    ADMIN
 ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   TOAST NOTIFICATION
+═══════════════════════════════════════════ */
+function showToast(msg, color) {
+  var t = document.getElementById('toast-msg');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.style.cssText = 'position:fixed;bottom:calc(80px + var(--sb,0px));left:50%;transform:translateX(-50%);'
+      + 'background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;'
+      + 'padding:9px 18px;font-size:12px;font-weight:700;z-index:9999;pointer-events:none;'
+      + 'opacity:0;transition:opacity .2s;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.style.color = color || 'var(--tx)';
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.opacity='0'; }, 2400);
+}
+
 function renderAdmin() {
+  // Pending approvals — grouped by type
+  var PENDING_GROUPS = [
+    { label:'🔴 우선 업무 지정 대기',  statuses:['pending-priority'] },
+    { label:'✅ 완료 처리 대기',        statuses:['pending-done'] },
+    { label:'🗓 구매예정 변경 대기',    statuses:['pending-planned'] },
+    { label:'✅ 구매완료 변경 대기',    statuses:['pending-bought'] },
+    { label:'📢 공지사항 등록 대기',    statuses:['pending-notice'] }
+  ];
+  var allPending = items.filter(function(x){ return APPROVAL_TARGET[x.status]; });
+  var pSection = document.getElementById('pending-section');
+  var pList = document.getElementById('pending-list');
+  if (pSection) pSection.style.display = ''; // always show
+  if (pList) {
+    if (allPending.length === 0) { pList.innerHTML = '<div style="padding:16px 0;text-align:center;color:var(--tx3);font-size:12px">✓ 승인 대기 항목이 없습니다</div>'; }
+    else {
+      var html = '';
+      PENDING_GROUPS.forEach(function(grp){
+        var grpItems = items.filter(function(x){ return grp.statuses.indexOf(x.status) > -1; });
+        if (grpItems.length === 0) return;
+        html += '<div style="font-size:11px;font-weight:700;color:#f0c040;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px">'+grp.label+' ('+grpItems.length+')</div>';
+        grpItems.forEach(function(itm){
+          var sm = STATUS_META[itm.status]||STATUS_META.priority;
+          var targetStatus = APPROVAL_TARGET[itm.status];
+          var targetMeta = STATUS_META[targetStatus]||STATUS_META.priority;
+          var requester = (itm.editLog && itm.editLog[itm.editLog.length-1]) ? itm.editLog[itm.editLog.length-1].user : '?';
+          html += '<div class="pending-row" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr)">'
+            + '<div style="flex:1;min-width:0;cursor:pointer" class="pending-open" data-pid="'+itm.id+'">'
+            + '<div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:2px">'+esc(itm.text)+'</div>'
+            + '<div style="font-size:10px;color:var(--tx3)">@'+esc(requester)+' 요청 · '+fmtDate(itm.ts)+'</div>'
+            + '<div style="font-size:10px;color:#f0c040;margin-top:2px">'+sm.icon+' '+sm.label+' → '+targetMeta.icon+' '+targetMeta.label+'</div>'
+            + '</div>'
+            + '<button class="add-btn" style="padding:6px 12px;font-size:11px;flex-shrink:0" data-pid="'+itm.id+'" data-ptarget="'+targetStatus+'">✓ 승인</button>'
+            + '<button class="danger-btn" style="padding:6px 12px;font-size:11px;flex-shrink:0" data-pid="'+itm.id+'">✕ 반려</button>'
+            + '</div>';
+        });
+      });
+      pList.innerHTML = html;
+      // 항목 본문 클릭 → 드로어 열기
+      pList.querySelectorAll('.pending-open').forEach(function(el){
+        el.addEventListener('click', function(){
+          var found = items.filter(function(x){ return x.id===this.dataset.pid; }.bind(this))[0];
+          if (found) { showPage('dash'); openDrawer(found); }
+        });
+      });
+    }
+
+    // Bind approve/reject
+    if (pList) {
+      pList.querySelectorAll('.add-btn[data-pid]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id = this.dataset.pid; var target = this.dataset.ptarget;
+          items.forEach(function(x){
+            if(x.id===id){
+              var prev = x.status;
+              x.status = target;
+              x.editLog = x.editLog||[];
+              x.editLog.push({ ts:Date.now(), type:'status', user:currentUser.id,
+                desc:'✅ 관리자 승인: '+(STATUS_META[prev]?STATUS_META[prev].label:prev)+' → '+(STATUS_META[target]?STATUS_META[target].label:target) });
+            }
+          });
+          saveItems(items); render(); renderAdmin();
+        });
+      });
+      pList.querySelectorAll('.danger-btn[data-pid]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var id = this.dataset.pid;
+          items.forEach(function(x){
+            if(x.id===id){
+              // Revert to previous non-pending status
+              var revert = x.status.replace('pending-','');
+              var revertMap = { 'priority':'short', 'done':'long', 'planned':'needed', 'bought':'planned', 'notice':'notice' };
+              x.status = revertMap[revert] || 'short';
+              x.editLog = x.editLog||[];
+              x.editLog.push({ ts:Date.now(), type:'status', user:currentUser.id, desc:'❌ 관리자 반려' });
+            }
+          });
+          saveItems(items); render(); renderAdmin();
+        });
+      });
+    }
+  }
+
   // stats
   var gc={task:0,issue:0,idea:0,supply:0,stock:0,notice:0};
   items.forEach(function(it){
@@ -2823,22 +3893,40 @@ function renderAdmin() {
   });
   document.getElementById('st-total').textContent=items.length;
   ['task','issue','idea','supply','stock','notice'].forEach(function(k){
-    document.getElementById('st-'+k).textContent=gc[k];
+    var el = document.getElementById('st-'+k);
+    if (el) el.textContent = gc[k];
   });
 
-  // accounts
+  var TEAMS = ['전극공정','조립공정','화성공정','모듈팩공정'];
   var accts=getAccounts();
   var html='';
   Object.keys(accts).forEach(function(id){
+    var teamVal = accts[id].team||'';
     html+='<div class="acct-row">';
     html+='<div class="acct-id">'+esc(id)+'</div>';
     html+='<span class="acct-role '+(accts[id].role==='admin'?'role-admin':'role-user')+'">'+
       (accts[id].role==='admin'?'관리자':'일반')+'</span>';
+    // 팀 배지 or 없음
+    if (teamVal) html+='<span class="acct-team-badge">'+esc(teamVal)+'</span>';
+    // 팀 변경 셀렉터
+    html+='<select class="acct-team-sel" data-uid="'+esc(id)+'" title="팀 변경">';
+    html+='<option value="">팀 없음</option>';
+    TEAMS.forEach(function(t){
+      html+='<option value="'+esc(t)+'"'+(teamVal===t?' selected':'')+'>'+esc(t)+'</option>';
+    });
+    html+='</select>';
     html+='<button class="acct-del" data-id="'+esc(id)+'" title="삭제">✕</button>';
     html+='</div>';
   });
   var el=document.getElementById('acct-list');
   el.innerHTML=html;
+  el.querySelectorAll('.acct-team-sel').forEach(function(sel){
+    sel.addEventListener('change',function(){
+      var uid=this.dataset.uid;
+      var a=getAccounts();
+      if(a[uid]){ a[uid].team=this.value; saveAccounts(a); showToast('팀 변경됨'); }
+    });
+  });
   el.querySelectorAll('.acct-del').forEach(function(btn){
     btn.addEventListener('click',function(){
       var delId=this.dataset.id;
@@ -2852,11 +3940,12 @@ window.addAccount=function(){
   var id=document.getElementById('new-id').value.trim();
   var pw=document.getElementById('new-pw').value;
   var role=document.getElementById('new-role').value;
+  var team=document.getElementById('new-team').value;
   var msg=document.getElementById('acct-msg');
   if(!id||!pw){ msg.textContent='아이디와 비밀번호를 입력해주세요.'; msg.style.color='var(--s-priority)'; return; }
   var accts=getAccounts();
   if(accts[id]){ msg.textContent='이미 존재하는 아이디입니다.'; msg.style.color='var(--s-priority)'; return; }
-  accts[id]={pw:pw,role:role};
+  accts[id]={pw:pw, role:role, team:team};
   saveAccounts(accts);
   document.getElementById('new-id').value='';
   document.getElementById('new-pw').value='';
@@ -2902,7 +3991,7 @@ function startApp() {
   if(sess){
     var accts=getAccounts();
     if(accts[sess.id]){
-      currentUser={id:sess.id, role:accts[sess.id].role};
+      currentUser={id:sess.id, role:accts[sess.id].role, team:accts[sess.id].team||''};
       startApp();
     } else {
       localStorage.removeItem('ws-session');
