@@ -915,7 +915,8 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
 .msg.a { align-self:flex-start; }
 .bubble { padding:9px 13px; border-radius:14px; font-size:13px; line-height:1.6; }
 .msg.u .bubble { background:var(--acc); color:#fff; border-radius:14px 14px 3px 14px; }
-.msg.a .bubble { background:var(--sur2); border:1px solid var(--bdr); border-radius:3px 14px 14px 14px; }
+.msg.a .err-bubble { background:rgba(255,79,100,.08) !important; border-color:rgba(255,79,100,.3) !important; color:var(--s-priority) !important; }
+.bubble { background:var(--sur2); border:1px solid var(--bdr); border-radius:3px 14px 14px 14px; }
 .msg-img { max-width:180px; border-radius:10px; margin-top:5px; border:1px solid var(--bdr); }
 
 .cpills { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
@@ -1428,6 +1429,26 @@ html, body { height:100%; overflow:hidden; background:var(--bg); color:var(--tx)
           <div class="admin-section-title" style="color:#f0c040">⏳ 승인 대기 항목</div>
           <div class="admin-card" id="pending-list-wrap">
             <div id="pending-list"></div>
+          </div>
+        </div>
+
+        <!-- API Key Settings -->
+        <div class="admin-section">
+          <div class="admin-section-title">🔑 API 키 설정</div>
+          <div class="admin-card">
+            <div style="font-size:12px;color:var(--tx2);margin-bottom:12px;line-height:1.7">
+              AI 자동 분류 기능 사용을 위해 Anthropic API 키가 필요합니다.<br>
+              API 키는 이 기기의 브라우저에만 저장되며 외부로 전송되지 않습니다.<br>
+              <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener"
+                style="color:var(--acc);font-size:11px">console.anthropic.com에서 키 발급 ↗</a>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <input class="f-input" id="api-key-input" type="password"
+                placeholder="sk-ant-..." style="flex:1;min-width:220px;font-family:monospace;font-size:12px">
+              <button class="add-btn" id="api-key-save-btn">저장</button>
+              <button class="danger-btn" id="api-key-clear-btn">삭제</button>
+            </div>
+            <div style="font-size:11px;margin-top:8px" id="api-key-msg"></div>
           </div>
         </div>
 
@@ -3705,9 +3726,20 @@ async function sendMsg(suffix) {
     }
     if (content.length===0) content.push({ type:'text', text:'(이미지만 첨부)' });
 
+    var apiKey = localStorage.getItem('ws-api-key')||'';
+    if (!apiKey) {
+      removeLoader(msgId);
+      addBubble('<div class="bubble err-bubble">⚙️ API 키가 설정되지 않았습니다.<br>관리자 탭 → API 키 설정에서 Anthropic API 키를 입력해주세요.</div>', false);
+      return;
+    }
     var resp = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:1000,
@@ -3804,6 +3836,47 @@ function showToast(msg, color) {
 }
 
 function renderAdmin() {
+  // ── API 키 섹션
+  var apiKeyInput = document.getElementById('api-key-input');
+  var apiKeyMsg   = document.getElementById('api-key-msg');
+  var storedKey   = localStorage.getItem('ws-api-key')||'';
+  if (apiKeyInput) {
+    apiKeyInput.placeholder = storedKey ? '●●●●●●●●●●●● (저장됨)' : 'sk-ant-...';
+  }
+  if (apiKeyMsg) {
+    if (storedKey) {
+      apiKeyMsg.style.color = 'var(--s-long)';
+      apiKeyMsg.textContent = '✓ API 키가 설정되어 있습니다 (끝 4자리: …' + storedKey.slice(-4) + ')';
+    } else {
+      apiKeyMsg.style.color = 'var(--s-inprog)';
+      apiKeyMsg.textContent = '⚠ API 키가 설정되지 않았습니다. AI 기능을 사용하려면 키를 입력하세요.';
+    }
+  }
+  var apiSaveBtn = document.getElementById('api-key-save-btn');
+  if (apiSaveBtn && !apiSaveBtn._bound) {
+    apiSaveBtn._bound = true;
+    apiSaveBtn.addEventListener('click', function(){
+      var val = (document.getElementById('api-key-input')||{}).value||'';
+      if (!val.startsWith('sk-')) {
+        if (apiKeyMsg) { apiKeyMsg.style.color='var(--s-priority)'; apiKeyMsg.textContent='올바른 API 키 형식이 아닙니다 (sk-ant-... 형식).'; }
+        return;
+      }
+      localStorage.setItem('ws-api-key', val);
+      document.getElementById('api-key-input').value = '';
+      if (apiKeyMsg) { apiKeyMsg.style.color='var(--s-long)'; apiKeyMsg.textContent='✓ API 키가 저장되었습니다 (끝 4자리: …'+val.slice(-4)+')'; }
+      apiKeyInput.placeholder = '●●●●●●●●●●●● (저장됨)';
+    });
+  }
+  var apiClearBtn = document.getElementById('api-key-clear-btn');
+  if (apiClearBtn && !apiClearBtn._bound) {
+    apiClearBtn._bound = true;
+    apiClearBtn.addEventListener('click', function(){
+      localStorage.removeItem('ws-api-key');
+      if (apiKeyInput) apiKeyInput.placeholder = 'sk-ant-...';
+      if (apiKeyMsg) { apiKeyMsg.style.color='var(--s-inprog)'; apiKeyMsg.textContent='API 키가 삭제되었습니다.'; }
+    });
+  }
+
   // Pending approvals — grouped by type
   var PENDING_GROUPS = [
     { label:'🔴 우선 업무 지정 대기',  statuses:['pending-priority'] },
