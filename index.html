@@ -432,6 +432,48 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 @media(hover:hover){.ic-mini:hover{background:var(--sur2);border-color:var(--bdr2)}}
 .ic-mini-text{flex:1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx)}
 .ic-mini-meta{display:flex;align-items:center;gap:3px;flex-shrink:0}
+
+/* ── DASHBOARD FILTER / SEARCH ── */
+#dash-filter-bar{
+  display:flex;align-items:center;gap:7px;
+  padding:10px 13px;border-bottom:1px solid var(--bdr);
+  flex-shrink:0;flex-wrap:wrap;background:var(--bg);
+  position:sticky;top:0;z-index:5;
+}
+.search-wrap{
+  flex:1;min-width:140px;position:relative;display:flex;align-items:center;
+}
+.search-ico{
+  position:absolute;left:9px;font-size:13px;color:var(--tx3);pointer-events:none;
+}
+#dash-search{
+  width:100%;background:var(--sur2);border:1.5px solid var(--bdr);
+  color:var(--tx);border-radius:var(--r2);padding:7px 9px 7px 30px;
+  font-family:'Noto Sans KR',sans-serif;font-size:12px;
+  outline:none;transition:border-color .18s;-webkit-appearance:none;
+}
+#dash-search:focus{border-color:var(--acc)}
+#dash-search::placeholder{color:var(--tx3)}
+.filter-chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.fchip{
+  font-size:11px;font-weight:600;border-radius:20px;
+  padding:4px 10px;cursor:pointer;border:1.5px solid var(--bdr2);
+  background:var(--sur);color:var(--tx3);transition:all .13s;
+  white-space:nowrap;
+}
+.fchip:hover{border-color:var(--bdr2);color:var(--tx2)}
+.fchip.on{border-color:var(--acc);background:var(--acc2);color:var(--acc)}
+.fchip.on.fc-done{border-color:var(--ok);background:rgba(72,199,142,.1);color:var(--ok)}
+.fchip.on.fc-none{border-color:var(--tx3);background:var(--sur3);color:var(--tx2)}
+.fchip.on.fc-prio{border-color:var(--err);background:rgba(255,92,92,.1);color:var(--err)}
+.fchip.on.fc-recur{border-color:#48c78e;background:rgba(72,199,142,.1);color:#48c78e}
+.fchip.on.fc-new{border-color:var(--err);background:rgba(255,92,92,.1);color:var(--err)}
+.filter-reset{
+  background:none;border:none;color:var(--tx3);font-size:11px;
+  cursor:pointer;font-family:'Noto Sans KR',sans-serif;padding:2px 5px;
+  border-radius:4px;white-space:nowrap;
+}
+.filter-reset:hover{color:var(--err)}
 </style>
 </head>
 <body>
@@ -497,6 +539,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <!-- DASH -->
     <div class="page" id="page-dash">
       <div id="dash-main">
+        <!-- 필터/검색 바 -->
+        <div id="dash-filter-bar">
+          <div class="search-wrap">
+            <span class="search-ico">🔍</span>
+            <input id="dash-search" placeholder="제목 검색..." oninput="onDashSearch(this.value)">
+          </div>
+          <div class="filter-chips" id="filter-chips"></div>
+          <button class="filter-reset" id="filter-reset-btn" onclick="resetFilters()" style="display:none">✕ 초기화</button>
+        </div>
         <div class="sa"><div class="dash-pad">
           <div class="group-row" id="group-row"></div>
           <div id="ctx-bar"><span style="font-size:10px;font-weight:700;color:var(--tx3)">카테고리</span><div id="ctx-chips"></div><button class="ctx-rst" onclick="resetCtx()">✕ 전체</button></div>
@@ -801,7 +852,55 @@ window.rvDeleteItem=function(key){
   toast('삭제됨');
 };
 
-/* ═══ ACCOUNT PAGE ═══ */
+/* ═══ DASHBOARD FILTER / SEARCH ═══ */
+var dashSearch = '';
+var activeFilters = {}; // key: filter id, value: true/false
+
+var FILTER_DEFS = [
+  { id:'none',  label:'시작 전',  cls:'fc-none',  test:function(x){return (x.progress||'none')==='none';} },
+  { id:'ing',   label:'진행 중',  cls:'fc-ing',   test:function(x){return x.progress==='ing';} },
+  { id:'done',  label:'완료',    cls:'fc-done',  test:function(x){return x.progress==='done';} },
+  { id:'prio',  label:'🔴 우선', cls:'fc-prio',  test:function(x){return x.priority==='high';} },
+  { id:'recur', label:'🔁 주기', cls:'fc-recur', test:function(x){return !!x.recur;} },
+  { id:'new',   label:'NEW',     cls:'fc-new',   test:function(x){return !!x.isNew;}, adminOnly:true },
+];
+
+function buildFilterChips(){
+  var el=document.getElementById('filter-chips'); if(!el) return;
+  el.innerHTML=FILTER_DEFS.filter(function(f){return !f.adminOnly||isAdmin();}).map(function(f){
+    var on=activeFilters[f.id];
+    return'<div class="fchip'+(on?' on '+f.cls:'')+'" data-fid="'+f.id+'">'+f.label+'</div>';
+  }).join('');
+  el.querySelectorAll('.fchip').forEach(function(chip){
+    chip.addEventListener('click',function(){
+      var fid=this.dataset.fid;
+      activeFilters[fid]=!activeFilters[fid];
+      buildFilterChips();
+      updateFilterResetBtn();
+      renderList();
+    });
+  });
+}
+
+function updateFilterResetBtn(){
+  var btn=document.getElementById('filter-reset-btn');if(!btn)return;
+  var anyOn=Object.values(activeFilters).some(Boolean)||dashSearch;
+  btn.style.display=anyOn?'':'none';
+}
+
+window.onDashSearch=function(val){
+  dashSearch=val.trim().toLowerCase();
+  updateFilterResetBtn();
+  renderList();
+};
+
+window.resetFilters=function(){
+  activeFilters={};dashSearch='';
+  var si=document.getElementById('dash-search');if(si)si.value='';
+  buildFilterChips();
+  updateFilterResetBtn();
+  renderList();
+};
 function renderAccount(){
   var el=document.getElementById('acct-content');if(!el)return;
   var acctList=Object.entries(accounts);
@@ -1080,7 +1179,7 @@ function renderToday(){
   }
   function setMiniList(id,type){
     var el=document.getElementById(id);if(!el)return;
-    var list=a.filter(function(x){return x.type===type&&x.progress!=='done';})
+    var list=a.filter(function(x){return x.type===type&&(x.progress||'none')!=='done';})
       .sort(function(a,b){return(b.ts||0)-(a.ts||0);});
     if(!list.length){
       el.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:6px 0">없음</div>';
@@ -1123,6 +1222,19 @@ function renderList(){
   var a=arr();
   if(curGroup)a=a.filter(function(x){return x.type===curGroup;});
   if(curCat)a=a.filter(function(x){return x.cat===curCat;});
+
+  // 텍스트 검색
+  if(dashSearch) a=a.filter(function(x){
+    return (x.text||'').toLowerCase().indexOf(dashSearch)>-1
+        ||(x.detail||'').toLowerCase().indexOf(dashSearch)>-1;
+  });
+
+  // 필터 칩 (모두 AND 조건)
+  if(Object.values(activeFilters).some(Boolean)){
+    var activeDefs=FILTER_DEFS.filter(function(f){return activeFilters[f.id];});
+    a=a.filter(function(x){return activeDefs.every(function(f){return f.test(x);});});
+  }
+
   a.sort(function(a,b){
     var ad=a.progress==='done'?1:0,bd=b.progress==='done'?1:0;if(ad!==bd)return ad-bd;
     // 관리자: NEW 항목 맨 위
@@ -1138,7 +1250,7 @@ function renderList(){
   if(!a.length){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">항목이 없습니다</div></div>';return;}
   el.innerHTML=a.map(function(item){return cardHtml(item);}).join('');bindCards(el);
 }
-function render(){updateProjSel();renderGR();renderCtx();renderList();}
+function render(){updateProjSel();renderGR();renderCtx();buildFilterChips();renderList();}
 
 /* input form builder */
 function buildForm(cid,isSheet){
