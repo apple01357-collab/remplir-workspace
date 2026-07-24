@@ -409,6 +409,29 @@ input[type="date"]::-webkit-inner-spin-button{display:none}
 input[type="date"]::-webkit-calendar-picker-indicator{
   filter:invert(.7);cursor:pointer;opacity:.7;
 }
+
+/* today bottom 3-col grid */
+.today-grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:6px;
+}
+@media(max-width:600px){.today-grid3{grid-template-columns:1fr}}
+.today-grid3-col{}
+.today-grid3-col .tsec-title{font-size:10px}
+/* compact card for grid */
+.ic-mini{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 9px;border-radius:var(--r3);
+  background:var(--sur);border:1px solid var(--bdr);
+  cursor:pointer;transition:background .15s;margin-bottom:3px;
+  -webkit-user-select:none;user-select:none;
+}
+.ic-mini:active{background:var(--sur2)}
+@media(hover:hover){.ic-mini:hover{background:var(--sur2);border-color:var(--bdr2)}}
+.ic-mini-text{flex:1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx)}
+.ic-mini-meta{display:flex;align-items:center;gap:3px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -455,6 +478,20 @@ input[type="date"]::-webkit-calendar-picker-indicator{
         <div class="today-hdr"><div class="today-title">⚡ 투데이</div><div class="today-sub" id="today-sub"></div></div>
         <div class="today-sec"><div class="tsec-title">🔴 우선임무</div><div class="t-items" id="t-urgent"></div></div>
         <div class="today-sec"><div class="tsec-title">📋 진행 중 업무</div><div class="t-items" id="t-inprog"></div></div>
+        <div class="today-grid3">
+          <div class="today-grid3-col">
+            <div class="tsec-title">🔧 이슈</div>
+            <div id="t-issue"></div>
+          </div>
+          <div class="today-grid3-col">
+            <div class="tsec-title">💡 아이디어</div>
+            <div id="t-idea"></div>
+          </div>
+          <div class="today-grid3-col">
+            <div class="tsec-title">🛒 필요물품</div>
+            <div id="t-supply"></div>
+          </div>
+        </div>
       </div></div>
     </div>
     <!-- DASH -->
@@ -1027,6 +1064,36 @@ function renderToday(){
   }
   setList('t-urgent',urgent,'우선임무 없음');
   setList('t-inprog',inp,'진행 중 업무 없음');
+
+  // ── 하단 3열: 이슈 / 아이디어 / 필요물품 (완료 제외, 최신순)
+  function miniCardHtml(item){
+    var dc={task:'dot-t',issue:'dot-i',idea:'dot-d',supply:'dot-s'}[item.type]||'dot-t';
+    var pm=item.type==='supply'?BUY_META:PGMETA;
+    var prog=pm[item.progress||'none']||pm.none;
+    var isDone=item.progress==='done';
+    var newBadge=(item.isNew&&isAdmin())?'<span class="new-badge" style="font-size:8px;padding:1px 4px">N</span>':'';
+    return'<div class="ic-mini'+(isDone?' ic-done':'')+'" data-k="'+item._k+'">'
+      +'<div class="ic-dot '+dc+'" style="width:6px;height:6px"></div>'
+      +'<div class="ic-mini-text">'+e(item.text)+'</div>'
+      +'<div class="ic-mini-meta">'+newBadge+'<span class="prog '+prog.c+'" style="font-size:9px;padding:1px 4px">'+prog.l+'</span></div>'
+      +'</div>';
+  }
+  function setMiniList(id,type){
+    var el=document.getElementById(id);if(!el)return;
+    var list=a.filter(function(x){return x.type===type&&x.progress!=='done';})
+      .sort(function(a,b){return(b.ts||0)-(a.ts||0);});
+    if(!list.length){
+      el.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:6px 0">없음</div>';
+      return;
+    }
+    el.innerHTML=list.map(miniCardHtml).join('');
+    el.querySelectorAll('.ic-mini').forEach(function(c){
+      c.addEventListener('click',function(){openDW(this.dataset.k);});
+    });
+  }
+  setMiniList('t-issue','issue');
+  setMiniList('t-idea','idea');
+  setMiniList('t-supply','supply');
 }
 
 /* dash */
