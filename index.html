@@ -466,6 +466,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   border-radius:4px;white-space:nowrap;
 }
 .filter-reset:hover{color:var(--err)}
+
+/* reminder badge */
+.reminder-badge{
+  font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;
+  background:rgba(245,197,66,.12);color:var(--warn);
+  border:1px solid rgba(245,197,66,.25);white-space:nowrap;
+}
 </style>
 </head>
 <body>
@@ -1054,7 +1061,20 @@ function getItm(k){return items[k]?Object.assign({},items[k],{_k:k}):null;}
 
 /* badges */
 function progBadge(item){var m=item.type==='supply'?BYMETA:PGMETA;var pm=m[item.progress||'none']||m.none;return'<span class="prog '+pm.c+'">'+pm.l+'</span>';}
-function ddayBadge(item){if(item.progress==='done')return'';var dd=dday(item.dueDate);if(dd===null)return'';var c=dd<0||dd<=2?'dd-u':dd<=7?'dd-s':'dd-ok';var t=dd<0?'D+'+Math.abs(dd):dd===0?'D-Day':'D-'+dd;return'<span class="dday '+c+'">'+t+'</span>';}
+function ddayBadge(item){
+  if(item.progress==='done') return '';
+  if(item.reminder){
+    var rd=dday(item.reminder);
+    if(rd!==null&&rd<=7&&rd>=0){
+      return'<span class="reminder-badge">🔔 '+(rd===0?'D-Day':'D-'+rd)+'</span>';
+    }
+  }
+  var dd=dday(item.dueDate);
+  if(dd===null) return '';
+  var c=dd<0||dd<=2?'dd-u':dd<=7?'dd-s':'dd-ok';
+  var t=dd<0?'D+'+Math.abs(dd):dd===0?'D-Day':'D-'+dd;
+  return'<span class="dday '+c+'">'+t+'</span>';
+}
 
 /* card html */
 function cardHtml(item,extra){
@@ -1136,32 +1156,49 @@ function renderToday(){
   var d=new Date();var sub=document.getElementById('today-sub');
   if(sub)sub.textContent=(d.getMonth()+1)+'월 '+d.getDate()+'일 '+DAYS[d.getDay()]+'요일';
   var a=arr();
+  var nowTs=today0().getTime();
 
   // 우선임무: high priority 항목만 (완료 제외)
   var urgent=a.filter(function(x){
     return x.progress!=='done' && x.priority==='high';
   });
+  var urgentKeys={};urgent.forEach(function(x){urgentKeys[x._k]=true;});
 
-  // 진행 중 업무: 진행중 상태 업무 (주기 업무 제외 - 별도 섹션)
+  // 진행 중 업무: 진행중 상태 업무 (주기/우선 제외)
   var inpAll=a.filter(function(x){
     if(x.type!=='task') return false;
-    if(x.recur) return false; // 주기 업무는 주기적 섹션으로
+    if(x.recur) return false;
+    if(urgentKeys[x._k]) return false; // 우선임무에 있으면 제외
     return x.progress==='ing';
   });
+
+  // 리마인더 도래(오늘~7일 이내) 항목 상단
+  var inpRemind=inpAll.filter(function(x){
+    if(!x.reminder) return false;
+    var rd=dday(x.reminder); return rd!==null&&rd<=7&&rd>=0;
+  }).sort(function(a,b){return new Date(a.reminder)-new Date(b.reminder);});
+
+  // 마감 임박(D-7 이내) 항목 그 다음
+  var remindKeys={};inpRemind.forEach(function(x){remindKeys[x._k]=true;});
   var inpNear=inpAll.filter(function(x){
+    if(remindKeys[x._k]) return false;
     var dd=dday(x.dueDate); return dd!==null&&dd<=7;
-  }).sort(function(a,b){
-    return new Date(a.dueDate)-new Date(b.dueDate);
-  });
+  }).sort(function(a,b){return new Date(a.dueDate)-new Date(b.dueDate);});
+  var nearKeys={};inpNear.forEach(function(x){nearKeys[x._k]=true;});
+
   var inpRest=inpAll.filter(function(x){
-    var dd=dday(x.dueDate); return dd===null||dd>7;
-  }).sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
-  var inp=inpNear.concat(inpRest);
+    return !remindKeys[x._k]&&!nearKeys[x._k];
+  }).sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  var inp=inpRemind.concat(inpNear).concat(inpRest);
 
   function makeCard(item){
-    var isNear=item.dueDate&&dday(item.dueDate)<=7;
-    var ex=isNear?'<span style="font-size:12px;margin-right:2px">📅</span>':'';
-    return cardHtml(item,ex);
+    var extra='';
+    if(item.reminder&&dday(item.reminder)!==null&&dday(item.reminder)<=7&&dday(item.reminder)>=0){
+      extra='<span style="font-size:12px;margin-right:2px">🔔</span>';
+    } else if(item.dueDate&&dday(item.dueDate)!==null&&dday(item.dueDate)<=7){
+      extra='<span style="font-size:12px;margin-right:2px">📅</span>';
+    }
+    return cardHtml(item,extra);
   }
   function setList(id,arr,em){
     var el=document.getElementById(id);if(!el)return;
@@ -1447,6 +1484,7 @@ function openDW(key){
     // 마감일 or 주기 (주기적이면 주기 설정, 아니면 마감일)
     +'<div id="dw-due-section"'+(item.recur?' style="display:none"':'')+'>'+
      '<div class="dw-field"><div class="dw-lbl">마감일</div><input class="dw-inp" type="date" id="dw-due" value="'+e(item.dueDate||'')+'"></div>'
+    +'<div class="dw-field"><div class="dw-lbl">🔔 리마인더 <span style="color:var(--tx3);font-size:10px">(이 날짜부터 진행중 상단 표시)</span></div><input class="dw-inp" type="date" id="dw-reminder" value="'+e(item.reminder||'')+'"></div>'
     +'</div>'
     +'<div id="dw-recur-section"'+(item.recur?'':' style="display:none"')+'>'
     +'<div class="dw-field"><div class="dw-lbl">반복 주기</div>'
@@ -1547,6 +1585,7 @@ window.saveItem=function(){
     }
   }
   var de=document.getElementById('dw-due');if(de&&!item.recur)item.dueDate=de.value||'';
+  var re2=document.getElementById('dw-reminder');if(re2)item.reminder=re2.value||'';
   if(isAdmin()){
     var pg=document.getElementById('dw-prog');
     if(pg){item.progress=pg.value;if(pg.value==='ing'||pg.value==='done')item.isNew=false;}
