@@ -1158,9 +1158,12 @@ function renderToday(){
   var a=arr();
   var nowTs=today0().getTime();
 
-  // 우선임무: high priority 항목만 (완료 제외)
+  // 우선임무: high priority 항목 + 마감 3일 이내 항목 (완료 제외)
   var urgent=a.filter(function(x){
-    return x.progress!=='done' && x.priority==='high';
+    if(x.progress==='done') return false;
+    if(x.priority==='high') return true;
+    var dd=dday(x.dueDate);
+    return dd!==null && dd<=3 && dd>=0;
   });
   var urgentKeys={};urgent.forEach(function(x){urgentKeys[x._k]=true;});
 
