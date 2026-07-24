@@ -48,7 +48,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 #app{display:none;flex-direction:column;height:100dvh;height:100vh}
 
 /* TOPBAR */
-#topbar{display:flex;align-items:center;padding:10px 16px;padding-top:max(10px,var(--st));border-bottom:1px solid var(--bdr);flex-shrink:0;gap:10px;background:var(--bg)}
+#topbar{display:flex;align-items:center;padding:8px 14px;padding-top:max(8px,var(--st));border-bottom:1px solid var(--bdr);flex-shrink:0;gap:8px;background:var(--bg)}
 .logo{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;letter-spacing:3px}
 .logo span{color:var(--acc)}
 #tb-date{font-size:11px;color:var(--tx3)}
@@ -56,7 +56,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 #sync-dot.syncing{background:var(--warn);animation:blink .8s infinite}
 #sync-dot.err{background:var(--err)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.user-pill{margin-left:auto;display:flex;align-items:center;gap:6px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:20px;padding:4px 9px 4px 5px}
+.user-pill{margin-left:auto;display:flex;align-items:center;gap:5px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:20px;padding:3px 8px 3px 4px}
 .u-av{width:20px;height:20px;border-radius:50%;background:var(--acc2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--acc)}
 .u-nm{font-size:11px;font-weight:600}
 .u-rl{font-size:10px;color:var(--tx3)}
@@ -306,6 +306,40 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 }
 .tl-toggle:hover{border-color:var(--acc);color:var(--acc)}
 .tl-hidden{display:none}
+
+@media(max-width:768px){
+  #tb-date{display:none}
+  .u-rl{display:none}
+  .logout-btn{font-size:14px;padding:2px 3px}
+  .u-nm{font-size:11px}
+}
+
+/* ── ACCOUNT PAGE ── */
+#page-account{overflow:hidden}
+.acct-pad{padding:16px;padding-bottom:calc(16px + var(--nav-h) + var(--sb));max-width:520px;margin:0 auto;width:100%}
+.acct-section{margin-bottom:24px}
+.acct-sec-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px}
+.acct-card{background:var(--sur);border:1.5px solid var(--bdr);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.acct-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr)}
+.acct-row:last-child{border-bottom:none}
+.acct-id{flex:1;font-size:13px;font-weight:700}
+.acct-realname{font-size:11px;color:var(--tx3);margin-top:2px}
+.acct-role-badge{font-size:10px;font-weight:700;border-radius:5px;padding:2px 8px}
+.arb-admin{background:rgba(255,92,92,.1);color:var(--err);border:1px solid rgba(255,92,92,.2)}
+.arb-user{background:var(--acc2);color:var(--acc);border:1px solid rgba(79,127,255,.2)}
+.acct-del-btn{background:none;border:1px solid rgba(255,92,92,.25);color:var(--err);font-size:11px;font-weight:700;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap}
+.acct-del-btn:hover{background:rgba(255,92,92,.1)}
+.add-acct-form{display:flex;flex-direction:column;gap:9px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)}
+.form-row{display:flex;gap:8px}
+.form-row .dw-inp{flex:1}
+.acct-submit{background:var(--acc);border:none;border-radius:var(--r2);padding:11px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%}
+.my-info-card{background:var(--sur2);border:1.5px solid var(--bdr2);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.my-info-label{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.8px;margin-bottom:4px}
+.my-info-val{font-size:15px;font-weight:700;margin-bottom:2px}
+.my-info-sub{font-size:11px;color:var(--tx3)}
+.pw-form{display:flex;flex-direction:column;gap:9px}
+.form-err{font-size:12px;color:var(--err);min-height:16px}
+.form-ok{font-size:12px;color:var(--ok);min-height:16px}
 </style>
 </head>
 <body>
@@ -335,13 +369,14 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
       <div class="u-av" id="u-av"></div>
       <div class="u-nm" id="u-nm"></div>
       <div class="u-rl" id="u-rl"></div>
-      <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+      <button class="logout-btn" onclick="doLogout()" title="로그아웃">⏻</button>
     </div>
   </div>
   <div id="pc-nav">
     <button class="nav-tab active" data-page="today">⚡ 투데이</button>
     <button class="nav-tab" data-page="dash">📋 대시보드</button>
     <button class="nav-tab" data-page="project">🗂 프로젝트</button>
+    <button class="nav-tab" data-page="account">👤 계정</button>
   </div>
   <div id="pages">
     <!-- TODAY -->
@@ -374,11 +409,16 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
         <div class="proj-grid" id="proj-grid"></div>
       </div></div>
     </div>
+    <!-- ACCOUNT -->
+    <div class="page" id="page-account">
+      <div class="sa"><div class="acct-pad" id="acct-content"></div></div>
+    </div>
   </div>
   <div id="bnav">
     <button class="bnav-btn active" data-bnav="today"><div class="bnav-ico">⚡</div><div class="bnav-lbl">투데이</div></button>
     <button class="bnav-btn" data-bnav="dash"><div class="bnav-ico">📋</div><div class="bnav-lbl">대시보드</div></button>
     <button class="bnav-btn" data-bnav="project"><div class="bnav-ico">🗂</div><div class="bnav-lbl">프로젝트</div></button>
+    <button class="bnav-btn" data-bnav="account"><div class="bnav-ico">👤</div><div class="bnav-lbl">계정</div></button>
     <button class="bnav-btn" data-bnav="add"><div class="bnav-ico">✦</div><div class="bnav-lbl">추가</div></button>
   </div>
 </div>
@@ -570,9 +610,119 @@ function showPage(p){
   if(p==='today')renderToday();
   if(p==='dash')render();
   if(p==='project')renderProjects();
+  if(p==='account')renderAccount();
 }
 window.showPage=showPage;
 function renderAll(){if(curPage==='today')renderToday();if(curPage==='dash')render();}
+
+/* ═══ ACCOUNT PAGE ═══ */
+function renderAccount(){
+  var el=document.getElementById('acct-content');if(!el)return;
+  var acctList=Object.entries(accounts);
+
+  if(isAdmin()){
+    // 관리자: 전체 계정 목록 + 삭제 + 새 계정 추가
+    var listHtml=acctList.map(function(ent){
+      var id=ent[0],a=ent[1];
+      var rn=a.realname?'<div class="acct-realname">'+e(a.realname)+'</div>':'';
+      var rb=a.role==='admin'?'<span class="acct-role-badge arb-admin">관리자</span>':'<span class="acct-role-badge arb-user">팀원</span>';
+      var del=id!==cu.id?'<button class="acct-del-btn" onclick="adminDelAcct(\''+id+'\')">삭제</button>':'<span style="font-size:11px;color:var(--tx3)">본인</span>';
+      return'<div class="acct-row"><div style="flex:1"><div class="acct-id">'+e(id)+'</div>'+rn+'</div>'+rb+del+'</div>';
+    }).join('');
+
+    el.innerHTML=
+      '<div class="acct-sec-title">👤 계정 관리</div>'
+      +'<div class="acct-card">'+listHtml+'</div>'
+      +'<div class="acct-card">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.7px;margin-bottom:12px">새 계정 추가</div>'
+      +'<div class="add-acct-form">'
+      +'<div class="form-row"><input class="dw-inp" id="na-id" placeholder="아이디"><input class="dw-inp" id="na-realname" placeholder="실명 (필수)"></div>'
+      +'<input class="dw-inp" id="na-pw" type="password" placeholder="비밀번호">'
+      +'<select class="dw-sel" id="na-role"><option value="user">팀원</option><option value="admin">관리자</option></select>'
+      +'<div class="form-err" id="na-err"></div>'
+      +'<button class="acct-submit" onclick="adminAddAcct()">계정 추가</button>'
+      +'</div></div>';
+  } else {
+    // 일반 사용자: 내 정보 + 아이디/비번/실명 수정
+    var a=accounts[cu.id]||{};
+    el.innerHTML=
+      '<div class="acct-sec-title">👤 내 계정</div>'
+      +'<div class="my-info-card">'
+      +'<div class="my-info-label">아이디</div><div class="my-info-val">'+e(cu.id)+'</div>'
+      +(a.realname?'<div class="my-info-sub">실명: '+e(a.realname)+'</div>':'<div class="my-info-sub" style="color:var(--err)">⚠ 실명을 등록해주세요</div>')
+      +'</div>'
+      +'<div class="acct-card">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.7px;margin-bottom:12px">정보 수정</div>'
+      +'<div class="pw-form">'
+      +'<div><div class="dw-lbl">실명 <span style="color:var(--err)">*</span></div><input class="dw-inp" id="my-realname" placeholder="실명 입력" value="'+e(a.realname||'')+'"></div>'
+      +'<div><div class="dw-lbl">현재 비밀번호</div><input class="dw-inp" type="password" id="my-pw-cur" placeholder="현재 비밀번호"></div>'
+      +'<div><div class="dw-lbl">새 비밀번호</div><input class="dw-inp" type="password" id="my-pw-new" placeholder="새 비밀번호 (변경 시 입력)"></div>'
+      +'<div><div class="dw-lbl">새 비밀번호 확인</div><input class="dw-inp" type="password" id="my-pw-new2" placeholder="새 비밀번호 확인"></div>'
+      +'<div class="form-err" id="my-err"></div>'
+      +'<div class="form-ok" id="my-ok"></div>'
+      +'<button class="acct-submit" onclick="myUpdateInfo()">저장</button>'
+      +'</div></div>';
+  }
+}
+
+window.adminDelAcct=function(id){
+  if(!confirm(id+' 계정을 삭제하시겠습니까?'))return;
+  var a=Object.assign({},accounts);
+  delete a[id];
+  fbSet('accounts',a);
+  accounts=a;
+  renderAccount();
+  toast('계정 삭제됨');
+};
+
+window.adminAddAcct=function(){
+  var id=(document.getElementById('na-id').value||'').trim();
+  var rn=(document.getElementById('na-realname').value||'').trim();
+  var pw=document.getElementById('na-pw').value||'';
+  var role=document.getElementById('na-role').value;
+  var err=document.getElementById('na-err');
+  if(!id){if(err)err.textContent='아이디를 입력해주세요.';return;}
+  if(!rn){if(err)err.textContent='실명을 입력해주세요.';return;}
+  if(!pw||pw.length<4){if(err)err.textContent='비밀번호는 4자 이상이어야 합니다.';return;}
+  if(accounts[id]){if(err)err.textContent='이미 존재하는 아이디입니다.';return;}
+  var a=Object.assign({},accounts);
+  a[id]={pw:pw,role:role,realname:rn};
+  fbSet('accounts',a);
+  accounts=a;
+  ['na-id','na-realname','na-pw'].forEach(function(i){var el=document.getElementById(i);if(el)el.value='';});
+  if(err)err.textContent='';
+  renderAccount();
+  toast('✓ 계정이 추가됐습니다.');
+};
+
+window.myUpdateInfo=function(){
+  var rn=(document.getElementById('my-realname').value||'').trim();
+  var curPw=document.getElementById('my-pw-cur').value||'';
+  var newPw=document.getElementById('my-pw-new').value||'';
+  var newPw2=document.getElementById('my-pw-new2').value||'';
+  var err=document.getElementById('my-err');
+  var ok=document.getElementById('my-ok');
+  if(err)err.textContent='';if(ok)ok.textContent='';
+  if(!rn){if(err)err.textContent='실명을 입력해주세요.';return;}
+  var a=Object.assign({},accounts);
+  var myAcct=Object.assign({},a[cu.id]||{});
+  myAcct.realname=rn;
+  // 비밀번호 변경 요청 시
+  if(curPw||newPw||newPw2){
+    if(myAcct.pw!==curPw){if(err)err.textContent='현재 비밀번호가 틀렸습니다.';return;}
+    if(!newPw||newPw.length<4){if(err)err.textContent='새 비밀번호는 4자 이상이어야 합니다.';return;}
+    if(newPw!==newPw2){if(err)err.textContent='새 비밀번호가 일치하지 않습니다.';return;}
+    myAcct.pw=newPw;
+  }
+  a[cu.id]=myAcct;
+  fbSet('accounts',a);
+  accounts=a;
+  // 세션 업데이트
+  lsSet('ws2-sess',cu);
+  ['my-pw-cur','my-pw-new','my-pw-new2'].forEach(function(i){var el=document.getElementById(i);if(el)el.value='';});
+  if(ok)ok.textContent='✓ 저장됐습니다.';
+  toast('✓ 정보가 업데이트됐습니다.');
+};
 
 /* item helpers */
 function arr(){return Object.entries(items).map(function(e){return Object.assign({},e[1],{_k:e[0]});});}
@@ -603,10 +753,37 @@ function renderToday(){
   var d=new Date();var sub=document.getElementById('today-sub');
   if(sub)sub.textContent=(d.getMonth()+1)+'월 '+d.getDate()+'일 '+DAYS[d.getDay()]+'요일';
   var a=arr();var wEnd=today0().getTime()+7*86400000;
-  var urgent=a.filter(function(x){if(x.progress==='done')return false;if(x.priority==='high')return true;var dd=dday(x.dueDate);return dd!==null&&dd<=2;});
-  var inp=a.filter(function(x){return x.type==='task'&&x.progress==='ing';}).sort(function(a,b){var aw=a.dueDate&&new Date(a.dueDate).getTime()<=wEnd;var bw=b.dueDate&&new Date(b.dueDate).getTime()<=wEnd;if(aw&&!bw)return-1;if(!aw&&bw)return 1;if(a.dueDate&&b.dueDate)return new Date(a.dueDate)-new Date(b.dueDate);return 0;});
-  function setList(id,arr,em){var el=document.getElementById(id);if(!el)return;if(!arr.length){el.innerHTML='<div class="empty" style="padding:10px 0"><div class="empty-text" style="font-size:11px">'+em+'</div></div>';return;}
-    el.innerHTML=arr.map(function(item){var isW=item.dueDate&&new Date(item.dueDate).getTime()<=wEnd;var ex=item.type==='task'&&isW&&item.progress!=='done'?'<span style="font-size:12px;margin-right:2px">📅</span>':'';return cardHtml(item,ex);}).join('');bindCards(el);}
+
+  // 우선임무: high priority 항목만 (완료 제외)
+  var urgent=a.filter(function(x){
+    return x.progress!=='done' && x.priority==='high';
+  });
+
+  // 진행 중 업무: 진행중 상태 업무, 이번주 마감 먼저
+  var inp=a.filter(function(x){
+    return x.type==='task' && x.progress==='ing';
+  }).sort(function(a,b){
+    var add=a.dueDate?dday(a.dueDate):null;
+    var bdd=b.dueDate?dday(b.dueDate):null;
+    // 기한 임박(D-7 이내)인 것 상단
+    var aNear=add!==null&&add<=7?1:0;
+    var bNear=bdd!==null&&bdd<=7?1:0;
+    if(aNear!==bNear) return bNear-aNear;
+    if(a.dueDate&&b.dueDate) return new Date(a.dueDate)-new Date(b.dueDate);
+    if(a.dueDate) return -1; if(b.dueDate) return 1;
+    return 0;
+  });
+
+  function setList(id,arr,em){
+    var el=document.getElementById(id);if(!el)return;
+    if(!arr.length){el.innerHTML='<div class="empty" style="padding:10px 0"><div class="empty-text" style="font-size:11px">'+em+'</div></div>';return;}
+    el.innerHTML=arr.map(function(item){
+      var isNear=item.dueDate&&dday(item.dueDate)<=7&&item.progress!=='done';
+      var ex=isNear?'<span style="font-size:12px;margin-right:2px">📅</span>':'';
+      return cardHtml(item,ex);
+    }).join('');
+    bindCards(el);
+  }
   setList('t-urgent',urgent,'우선임무 없음');
   setList('t-inprog',inp,'진행 중 업무 없음');
 }
