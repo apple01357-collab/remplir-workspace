@@ -261,18 +261,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Noto San
 #fab{position:fixed;bottom:calc(var(--nav-h) + 12px + var(--sb));right:16px;z-index:50;width:46px;height:46px;border-radius:13px;background:var(--acc);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 6px 20px rgba(79,127,255,.4);display:none;align-items:center;justify-content:center}
 
 /* RESPONSIVE */
+/* 모바일/PC 레이아웃은 JS updateLayout()으로 제어 */
 @media(max-width:768px){
-  #pc-nav{display:none}
-  #bnav{display:flex}
   #page-dash{flex-direction:column}
-  #inp-panel{display:none}
-  #fab{display:flex}
   .dash-pad,.today-pad,.proj-pad,.acct-pad,.review-pad{padding-bottom:calc(13px + var(--nav-h) + var(--sb))}
-}
-@media(min-width:769px){
-  #bnav{display:none}
-  #inp-sheet{display:none!important}
-  #fab{display:none!important}
 }
 
 /* ── TIMELINE ── */
@@ -762,7 +754,24 @@ function startApp(){
   subscribe();
   renderTopDate();setInterval(renderTopDate,60000);
   updateAdminUI();
+  updateLayout();
+  window.addEventListener('resize',updateLayout);
   showPage('today');
+}
+
+function updateLayout(){
+  var isMobile=window.innerWidth<=768;
+  var pcNav=document.getElementById('pc-nav');
+  var bnav=document.getElementById('bnav');
+  var panel=document.getElementById('inp-panel');
+  var fab=document.getElementById('fab');
+  var sheet=document.getElementById('inp-sheet');
+  if(pcNav) pcNav.style.display=isMobile?'none':'flex';
+  if(bnav)  bnav.style.display=isMobile?'flex':'none';
+  if(panel) panel.style.display=isMobile?'none':'flex';
+  if(fab)   fab.style.display=isMobile?'flex':'none';
+  if(sheet &&!document.getElementById('inp-sheet').classList.contains('open'))
+    sheet.style.display=isMobile?'flex':'none';
 }
 
 /* page */
